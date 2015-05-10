@@ -3,8 +3,9 @@
 define('PICCOLO_START_MICROTIME', microtime(true));
 
 //Системная информация
-define('PICCOLO_CORE_BUILD', '2');//Версия ядра
+define('PICCOLO_CORE_BUILD', '3');//Версия ядра
 define('PICCOLO_WORKS', true);//Пометка, что работает именно CMS Piccolo
+define('PICCOLO_WSE_STAFF',true);//Минимальная совместимость с MSC: WebSiteEngine
 define('PICCOLO_SYSTEM_DEBUG', true);//Режим отладки
 
 //Информация о папках
@@ -21,6 +22,27 @@ define('PICCOLO_TRANSLATIONS_DIR', PICCOLO_CMS_DIR.DIRECTORY_SEPARATOR.'locales'
 if(PICCOLO_SYSTEM_DEBUG){
     error_reporting(-1);
     ini_set('display_errors', 1);
+}
+
+//Имитация ядра WSE
+if(PICCOLO_WSE_STAFF){
+    
+    define("WSE_START_MICROTIME", PICCOLO_START_MICROTIME);//Запоминаем время
+
+    define("MSC_WSE_CORE_VERSION", '4');//Имитируемая версия ядра, возможно отличие в поведении
+    define("WSE_INCLUDE", true);//Имитируем работу WSE
+    define("WSE_DEBUG", PICCOLO_SYSTEM_DEBUG);//Определяем работает ли отладка
+
+    //Остальные системные папки
+    define("WSE_ROOT_DIR", PICCOLO_ROOT_DIR);
+    define("WSE_CMS_DIR", PICCOLO_CMS_DIR);
+    define("WSE_CONFIG_DIR",PICCOLO_CONFIGS_DIR);
+    define("WSE_TMPL_DIR", PICCOLO_TEMPLATES_DIR);
+    define("WSE_SCRIPTS_DIR", PICCOLO_SCRIPTS_DIR);
+    define("WSE_TRANSLATE_DIR", PICCOLO_TRANSLATIONS_DIR);
+    
+    //Создаем алиас для класса ядра
+    class_alias ('PICCOLO_ENGINE' , 'WSE_ENGINE');
 }
 
 //Главный класс (ядро)
@@ -115,6 +137,7 @@ final class PICCOLO_ENGINE{
 	$allInfo = self::getAllScriptsInfo();
         if($alias == '' || $alias == null || !isset($allInfo[$alias])){ return false; }
         $info = $allInfo[$alias];
+        if(isset($info['need_wse']) && !PICCOLO_WSE_STAFF){return false;}//Если скрипту нужно наличие WSE, а эмуляция отключена, то отвечаем false
         if(!(isset($info['file']) || isset($info['a_file']))){ return false; }
 	if(isset($info['file']) && !is_file(PICCOLO_SCRIPTS_DIR.DIRECTORY_SEPARATOR.$info['file'].'.php')){ return false; }
         elseif(isset($info['file'])){
@@ -142,10 +165,7 @@ final class PICCOLO_ENGINE{
      * Загружет кеш, если его нет или выдает кеш, если уже загрузен
      */
     public static function getAllScriptsInfo(){
-	if(self::$all_scripts_cache == null){
-            self::$all_scripts_cache = is_file(PICCOLO_CMS_DIR.DIRECTORY_SEPARATOR.'scripts.ini') ? parse_ini_file(PICCOLO_CMS_DIR.DIRECTORY_SEPARATOR.'scripts.ini', true) : array();
-        }
-        return self::$all_scripts_cache;
+	return isset(self::$config['scripts']) ? self::$config['scripts'] : array();
     }
 
     /*
