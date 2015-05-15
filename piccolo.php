@@ -3,7 +3,7 @@
 define('PICCOLO_START_MICROTIME', microtime(true));
 
 //Системная информация
-define('PICCOLO_CORE_BUILD', '3');//Версия ядра
+define('PICCOLO_CORE_BUILD', '4');//Версия ядра
 define('PICCOLO_WORKS', true);//Пометка, что работает именно CMS Piccolo
 define('PICCOLO_WSE_STAFF',true);//Минимальная совместимость с MSC: WebSiteEngine
 define('PICCOLO_SYSTEM_DEBUG', true);//Режим отладки
@@ -238,10 +238,19 @@ final class PICCOLO_ENGINE{
 	if(isset($tag['type']) && $tag['type'] == 'system'){
             return self::getSystemVar($tag['name']);
         }elseif(isset($tag['type']) && $tag['type'] == 'script'){
-            if(isset($tag['name']) && isset($tag['action']) && self::checkScript($tag['name']) && method_exists($tag['name'], $tag['action'])){
-                $cl = $tag['name'];
-                return $cl::$tag['action']($tag);
-            }elseif(PICCOLO_SYSTEM_DEBUG){ return 'Can\'t handle script tag "'.($tag['name']).'"'; }
+            
+            //Проверка наличия скрипта
+            if(!(isset($tag['name']) && isset($tag['action']) && self::checkScript($tag['name']) && method_exists($tag['name'], $tag['action'])) && PICCOLO_SYSTEM_DEBUG){ return 'Can\'t handle script tag "'.($tag['name']).'"'; }
+            if(!(isset($tag['name']) && isset($tag['action']) && self::checkScript($tag['name']) && method_exists($tag['name'], $tag['action']))){ return ''; }
+            
+            //Проверка публичных методов для отображения
+            $sinfo = self::getScriptInfo($tag['name']);
+            if((!isset($sinfo['actions']) || !in_array($tag['action'], $sinfo['actions'])) && PICCOLO_SYSTEM_DEBUG){return 'Can\'t handle script tag "'.($tag['name']).'". Access dined.';}
+            if(!isset($sinfo['actions']) || !in_array($tag['action'], $sinfo['actions'])){return '';}
+            
+            $cl = $tag['name'];
+            return $cl::$tag['action']($tag);
+            
         }else{ return self::getRegistredTypeBy($tag); }
     }
 
@@ -317,7 +326,7 @@ final class PICCOLO_ENGINE{
      * Результат работы функции 'value'
      */
     public static function getRTmpl($name, $arr){
-	if(self::isTmpl($name) == false){
+	if(!self::isTmpl($name)){
             $return = '<p>Во вроемя вывода шаблона возникла ошибка, но вам было передано следующее:</p>';
             if(!is_array($arr)){return $return;}
 	    foreach($arr as $code => $val){ $return .= '<p>$code: <br/>$val</p>'; }
