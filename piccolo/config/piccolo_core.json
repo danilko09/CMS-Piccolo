@@ -1,0 +1,9 @@
+{
+    "scripts":{
+        "page_data":{
+            "file":"page_data",
+            "autoload":"1",
+            "actions":["getData"]
+        }
+    }
+}
