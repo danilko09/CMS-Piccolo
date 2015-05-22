@@ -1,9 +1,7 @@
 {
     "scripts":{
-        "page_data":{
-            "file":"page_data",
-            "autoload":"1",
-            "actions":["getData"]
+        "piccolo_pdo":{
+            "file":"p_pdo"
         }
     }
 }
