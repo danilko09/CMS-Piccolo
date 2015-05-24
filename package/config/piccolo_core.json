@@ -1,0 +1,11 @@
+{
+    "main":{
+        "def_locale":"ru-RU"
+    },
+    "scripts":{
+        "piccolo_blog":{
+            "file":"simple_blog",
+            "actions":["showPage"]
+        }
+    }
+}

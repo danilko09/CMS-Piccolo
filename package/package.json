@@ -1,0 +1,12 @@
+{
+    "configs":[
+        {"file_in":"config/piccolo_core.json","file_out":"piccolo_core.json"},
+        {"file_in":"config/piccolo_blog.json","file_out":"piccolo_blog.json"}
+    ],
+    "scripts":[
+        {"file_in":"scripts/simple_blog.php","file_out":"simple_blog.php"}
+    ],
+    "templates":[
+        {"file_in":"templates/scripts/piccolo_blog/blog_post.html","file_out":"scripts/piccolo_blog/blog_post.html"}
+    ]
+}
