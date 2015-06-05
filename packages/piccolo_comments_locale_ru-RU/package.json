@@ -1,0 +1,6 @@
+{
+    "title":"Русская локализация для системы комментариев (piccolo_comments)",
+    "locales":[
+        {"file_in":"piccolo_comments_ru-RU.ini","file_out":"piccolo_comments.ini","mode":"merge"}
+    ]
+}

@@ -1,0 +1,9 @@
+{
+    "title":"Система комментариев для CMS Piccolo",
+    "configs":[
+        {"file_in":"configs/core.json","file_out":"piccolo_core.json","mode":"merge"},
+        {"file_in":"configs/comments.json","file_out":"piccolo_comments.json","mode":"merge"}
+        ],
+    "templates":[],
+    "scripts":[{"file_in":"piccolo_comments.php","file_out":"piccolo_comments.php","mode":"replace"}]
+}
