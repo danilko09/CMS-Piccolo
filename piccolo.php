@@ -1,14 +1,14 @@
 <?php
 
-//Отмечаем время начала работы системы
+    //Отмечаем время начала работы системы
     define('PICCOLO_START_MICROTIME', microtime(true));
 
-//Системная информация
-    define('PICCOLO_CORE_BUILD', '5'); //Версия ядра
+    //Системная информация
+    define('PICCOLO_CORE_BUILD', '6'); //Версия ядра
     define('PICCOLO_WORKS', true); //Пометка, что работает именно CMS Piccolo
-    define('PICCOLO_WSE_STAFF', true); //Минимальная совместимость с MSC: WebSiteEngine
-    define('PICCOLO_SYSTEM_DEBUG', true); //Режим отладки
-//Информация о папках
+    define('PICCOLO_WSE_STAFF', true); //Минимальная совместимость с MSC: WebSiteEngine (вкл/вкл)
+    define('PICCOLO_SYSTEM_DEBUG', true); //Режим отладки (вкл/вкл)
+    //Информация о папках
     define('PICCOLO_ROOT_DIR', __DIR__); //Корневая директория, где лежит этот файл
     define('PICCOLO_CMS_DIR', PICCOLO_ROOT_DIR . DIRECTORY_SEPARATOR . 'piccolo'); //Папка с файлами CMS
     define('PICCOLO_CMS_URL', '/piccolo'); //Внешний URI папки с файлами CMS
@@ -17,13 +17,14 @@
     define('PICCOLO_TEMPLATES_URL', PICCOLO_CMS_URL . '/templates'); //Внешний URI папки с шаблонами
     define('PICCOLO_SCRIPTS_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'scripts'); //Папка с расширениями (моудялми) системы
     define('PICCOLO_TRANSLATIONS_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'locales'); //Папка с локализациями системы
-//Включение вывода ошибок
+    
+    //Включение вывода ошибок, если включена отладка
     if(PICCOLO_SYSTEM_DEBUG){
         error_reporting(-1);
         ini_set('display_errors', 1);
     }
 
-//Имитация ядра WSE
+    //Имитация ядра WSE, если включена
     if(PICCOLO_WSE_STAFF){
 
         define("WSE_START_MICROTIME", PICCOLO_START_MICROTIME); //Запоминаем время
@@ -43,8 +44,27 @@
         class_alias('PICCOLO_ENGINE', 'WSE_ENGINE');
     }
 
-//Главный класс (ядро)
+    //Главный класс (ядро)
     final class PICCOLO_ENGINE {
+
+        //Инициализация
+        /*
+         * Входная точка в систему
+         */
+        public static function start(){
+            session_start(); //Запускаем сессию
+            //Грузим конфиг
+            self::$config = self::loadConfig('piccolo_core');
+            self::autoload(); //Проводим авто-загрузку скриптов
+            if(filter_input(INPUT_GET, 'ajax') == '1'){//Если ajax-запрос
+                echo self::GetContentByTag(filter_input_array(INPUT_GET)); //Выводим данные
+                exit; //Завершаем работу
+            }//Если не ajax-запрос
+            echo self::PrepearHTML(self::getTmpl('index')); //Обрабатываем и выводим шаблон главной страницы
+            if(PICCOLO_SYSTEM_DEBUG){
+                self::printTimings();
+            }//Выводим отладочную информацию, если включен режим отладки
+        }
 
         //URI(L)
         private static $url = null;
@@ -99,46 +119,33 @@
         /*
          * Генерирует результаты работы функций, которые представлены выше
          */
+
         private static function genURLI(){
-            //Получаем полный URL
-            self::$url = 'http://' . (filter_input(INPUT_SERVER, 'HTTP_HOST') == null ? $_SERVER['HTTP_HOST']
-                                : filter_input(INPUT_SERVER, 'HTTP_HOST')) . (filter_input(INPUT_SERVER, 'PHP_SELF') == null
-                                ? $_SERVER['PHP_SELF'] : filter_input(INPUT_SERVER, 'PHP_SELF'));
-            //Бьем адрес на две части
-            $url = explode('index.php', self::$url);
-            //Сохраняем базовый URL
-            self::$url_base = trim($url[0], '/');
-            //Если у нас получились две части, то создаем массив uri
-            if(isset($url[1])){
-                self::$uri = explode('/', $url[1]);
+            //Получаем полный URL с index.php
+            $f_url = 'http://' . self::getSrvInf('HTTP_HOST') . self::getSrvInf('PHP_SELF');
+            $url = explode('index.php', $f_url); //Бьем адрес на две части
+            self::$url_base = rtrim($url[0], '/'); //Сохраняем базовый URL
+            if(isset($url[1])){//Если у нас получились две части, то создаем массив uri
+                self::$uri = explode('/', rtrim($url[1], '/'));
                 array_shift(self::$uri);
             }else{
-                self::$uri[0] = '';
+                self::$uri = array('');
             }//Если же часть одна, то оставляем uri с одной пустой строкой
-            //Генерируем ссылку на кглавную
-            $u = 'http://' . (filter_input(INPUT_SERVER, 'HTTP_HOST') == null ? $_SERVER['HTTP_HOST']
-                                : filter_input(INPUT_SERVER, 'HTTP_HOST'))
-                    . (filter_input(INPUT_SERVER, 'PHP_SELF') == null ? $_SERVER['PHP_SELF'] : filter_input(INPUT_SERVER, 'PHP_SELF'));
-            self::$index = $url[1] == '' ? $u : rtrim(substr($u, 0, strpos($u, $url[1])), '/');
+            $c_url = 'http://' . self::getSrvInf('HTTP_HOST') . self::getSrvInf('REQUEST_URI'); //Получаем точный URL
+            self::$url = rtrim($c_url, '?' . self::getSrvInf('QUERY_STRING')); //Отсекаем GET-параметры и сохраняем
+            self::$index = str_replace($url[1], '', self::$url); //Получаем index и сохраняем
         }
 
-        //Инициализация
-        /*
-         * Входная точка в систему
-         */
-        public static function start(){
-            session_start(); //Запускаем сессию
-            //Грузим конфиг
-            self::$config = self::loadConfig('piccolo_core');
-            self::autoload(); //Проводим авто-загрузку скриптов
-            if(filter_input(INPUT_GET, 'ajax') == '1'){//Если ajax-запрос
-                echo self::GetContentByTag(filter_input_array(INPUT_GET)); //Выводим данные
-                exit; //Завершаем работу
-            }//Если не ajax-запрос
-            echo self::PrepearHTML(self::getTmpl('index')); //Обрабатываем и выводим шаблон главной страницы
-            if(PICCOLO_SYSTEM_DEBUG){
-                self::printTimings();
-            }//Выводим отладочную информацию, если включен режим отладки
+        //Возвращает информацию из $_SERVER или, по возможности, из filter_input_array(INPUT_SERVER) 
+        public static function getSrvInf($var){
+            $fin = filter_input(INPUT_SERVER, $var); //Сохраняем, чтоб не тратить время на повторный вызов
+            if($fin !== null){
+                return $fin; //Если не null - возвращаем
+            }
+            if(isset($_SERVER[$var])){//Если $fin === null, но есть в $_SERVER
+                return $_SERVER[$var]; //Возвращаем
+            }
+            return null; //Если ни там, ни там не нашли, то возвращаем null
         }
 
         //Скрипты
@@ -152,33 +159,26 @@
          */
 
         public static function checkScript($alias){
-            $allInfo = self::getAllScriptsInfo();
-            if($alias == '' || $alias == null || !isset($allInfo[$alias])){
+            $info = self::getScriptInfo($alias); //Получаем информацию о скрипте
+            if($alias == '' || $alias == null || $info === false){//Проверяем название и наличие записи в конфиге ядра
                 return false;
             }
-            $info = $allInfo[$alias];
-            if(isset($info['need_wse']) && !PICCOLO_WSE_STAFF){
+            if(isset(self::$loaded[$alias]) && self::$loaded[$alias] == true){//Если уже загружен, то сразу отвечаем, что всё ок
+                return true;
+            }
+            $file = isset($info['file']) ? $info['file'] : $alias; //Определяем имя файла
+            if(!is_file(PICCOLO_SCRIPTS_DIR . DIRECTORY_SEPARATOR . $file . '.php') || (isset($info['need_wse']) && !PICCOLO_WSE_STAFF)){
                 return false;
-            }//Если скрипту нужно наличие WSE, а эмуляция отключена, то отвечаем false
-            if(!(isset($info['file']) || isset($info['a_file']))){
+            }//Ответ false, если нет файла или требуется отключенная поддержка WSE_ENGINE 
+            include_once PICCOLO_SCRIPTS_DIR . DIRECTORY_SEPARATOR . $file . '.php'; //Подгружаем нащ файл
+            if(!class_exists($alias)){//Проверяем наличие класса, если его нет, то отвечаем false
                 return false;
             }
-            if(isset($info['file']) && !is_file(PICCOLO_SCRIPTS_DIR . DIRECTORY_SEPARATOR . $info['file'] . '.php')){
-                return false;
-            }elseif(isset($info['file'])){
-                include_once PICCOLO_SCRIPTS_DIR . DIRECTORY_SEPARATOR . $info['file'] . '.php';
-                if(!class_exists($alias)){
-                    return false;
-                }
-                if(isset(self::$loaded[$alias]) && self::$loaded[$alias] == true){
-                    return true;
-                }
-                if(method_exists($alias, 'onLoad')){
-                    $alias::onLoad();
-                }
-                self::$loaded[$alias] = true;
+            if(method_exists($alias, 'onLoad')){//Автозагрузка скрипта: если метод onLoad есть, то вызываем его
+                $alias::onLoad();
             }
-            return true;
+            self::$loaded[$alias] = true; //Отмечаем скрипт как загруженный
+            return true; //Отвечаем, что скрипт загрузился успешно
         }
 
         /*
@@ -186,12 +186,8 @@
          */
 
         public static function getScriptInfo($alias){
-            if(self::checkScript($alias)){
-                $info = self::getAllScriptsInfo();
-                return $info[$alias];
-            }else{
-                return false;
-            }
+            $info = self::getAllScriptsInfo();
+            return isset($info[$alias]) ? $info[$alias] : false;
         }
 
         /*
@@ -247,7 +243,7 @@
          */
 
         public static function updateConfig($config, $data){
-            file_put_contents(PICCOLO_CONFIG_DIR . DIRECTORY_SEPARATOR . $config . '.json', json_encode($data));
+            file_put_contents(PICCOLO_CONFIGS_DIR . DIRECTORY_SEPARATOR . $config . '.json', json_encode($data));
         }
 
         //Локализации
@@ -261,11 +257,7 @@
             if($mark == '' || $mark == null){
                 return null;
             }
-            if(self::$locales_cache == null){
-                self::$locales_cache = is_file(PICCOLO_TRANSLATIONS_DIR . DIRECTORY_SEPARATOR . 'main.ini')
-                            ? parse_ini_file(PICCOLO_TRANSLATIONS_DIR . DIRECTORY_SEPARATOR . 'main.ini', true)
-                            : array();
-            }
+            self::loadMainLocales();
             $data = self::$locales_cache;
             if($script !== null && file_exists(PICCOLO_TRANSLATIONS_DIR . DIRECTORY_SEPARATOR . $script . '.ini')){
                 foreach(parse_ini_file(PICCOLO_TRANSLATIONS_DIR . DIRECTORY_SEPARATOR . $script . '.ini', true) as $lang => $vars){
@@ -284,6 +276,14 @@
             return $mark;
         }
 
+        private static function loadMainLocales(){
+            if(self::$locales_cache == null){
+                self::$locales_cache = is_file(PICCOLO_TRANSLATIONS_DIR . DIRECTORY_SEPARATOR . 'main.ini')
+                            ? parse_ini_file(PICCOLO_TRANSLATIONS_DIR . DIRECTORY_SEPARATOR . 'main.ini', true)
+                            : array();
+            }
+        }
+
         //Шаблонизация
         private static $types;
 
@@ -293,10 +293,7 @@
 
         public static function GetContentByTag($tag){
             //Если запрашивается системная переменная
-            if(isset($tag['type']) && $tag['type'] == 'system'){
-                return self::getSystemVar($tag['name']);
-            }elseif(isset($tag['type']) && $tag['type'] == 'script'){//Если запрашиывается вызов скрипта
-
+            if(isset($tag['type']) && $tag['type'] == 'script'){//Если запрашивается вызов скрипта
                 //Проверка наличия скрипта
                 if(!(isset($tag['name']) && isset($tag['action']) && self::checkScript($tag['name']) && method_exists($tag['name'], $tag['action'])) && PICCOLO_SYSTEM_DEBUG){
                     return 'Can\'t handle script tag "' . ($tag['name']) . '"';
@@ -305,18 +302,71 @@
                 }
 
                 //Проверка публичных методов для отображения
-                $sinfo = self::getScriptInfo($tag['name']);
-                if((!isset($sinfo['actions']) || !in_array($tag['action'], $sinfo['actions'])) && PICCOLO_SYSTEM_DEBUG){
+                if(!self::isAction($tag['name'], $tag['action']) && PICCOLO_SYSTEM_DEBUG){
                     return 'Can\'t handle script tag "' . ($tag['name']) . '". Access dined.';
-                }elseif(!isset($sinfo['actions']) || !in_array($tag['action'], $sinfo['actions'])){
+                }elseif(!self::isAction($tag['name'], $tag['action'])){
                     return '';
                 }
 
                 $cl = $tag['name'];
-                return $cl::$tag['action']($tag);
-            }else{//Попытка обработать тег по зарегистрированному типу, если больше ничего не спасает
-                return self::getRegistredTypeBy($tag);
+                try{
+                    return $cl::$tag['action']($tag);
+                }catch(Exception $e){
+                    return PICCOLO_SYSTEM_DEBUG ? $e->getTrace() : 'Can\'t handle script tag "' . ($tag['name']) . '". Error in code.';
+                }
             }
+            return self::getRegistredTypeBy($tag); //Если не удалось обработать как скриптовый тег, тогда пытаемся обработать по типу
+        }
+
+        /*
+         * Пытается обработать тег по зарегистрированному обработчику
+         */
+
+        private static function getRegistredTypeBy($tag){
+            if(!isset($tag['type']) || !isset(self::$types[$tag['type']])){
+                return PICCOLO_SYSTEM_DEBUG ? ('Can\'t handle tag' . (isset($tag['type']) ? ' type "' . $tag['type'] . '", reason: tag type not registred'
+                                    : ', reason: no type')) : '';
+            }
+            $code = self::$types[$tag['type']];
+            if(self::checkScript($code) && method_exists($code, 'handleTag')){
+                return $code::handleTag($tag);
+            }elseif(PICCOLO_SYSTEM_DEBUG){
+                return 'Can\'t handle tag type "' . (isset($tag['type']) ? $tag['type'] : ' ') . '", reason: no method in class "' . $code . '" or script not found';
+            }else{
+                return '';
+            }
+        }
+
+        /*
+         * Функция нужна для корректной эмуляции WSE_ENGINE
+         * Возвращает только сообщение о том, что функция устарела
+         */
+
+        public static function getSystemVar(){
+            return self::translate('SYSTEM_VARS_DEPRECATED');
+        }
+
+        /*
+         * Проверяет разрешено ли метод вызывать как действие для тега типа script
+         * true - разрешено
+         * false - не разрешено
+         */
+
+        public static function isAction($script, $method){
+            if(!self::checkScript($script)){
+                return false;
+            }
+            $sinfo = self::getScriptInfo($script);
+            if(!isset($sinfo['actions'])){
+                return false;
+            }
+            if(is_string($sinfo['actions']) && $sinfo['actions'] === $method){
+                return true;
+            }
+            if(is_array($sinfo['actions']) && in_array($method, $sinfo['actions'])){
+                return true;
+            }
+            return false;
         }
 
         /*
@@ -325,33 +375,6 @@
 
         public static function RegisterTagHandler($tag_type, $handler){
             self::$types[$tag_type] = $handler;
-        }
-
-        /*
-         * Возвращает системные переменные
-         */
-
-        private static function getSystemVar($var){
-            if($var == 'title'){
-                return self::$config['main']['site_name'];
-            }
-            return $var;
-        }
-
-        /*
-         * Пытается обработать тег по зарегистрированному обработчику
-         */
-
-        private static function getRegistredTypeBy($tag){
-            $code = isset($tag['type']) && isset(self::$types[$tag['type']]) ? self::$types[$tag['type']]
-                        : '';
-            if(self::checkScript($code) && method_exists($code, 'handleTag')){
-                return $code::handleTag($tag);
-            }elseif(PICCOLO_SYSTEM_DEBUG){
-                return 'Can\'t handle tag type "' . (isset($tag['type']) ? $tag['type'] : ' ') . '", reason: no method in class "' . $code . '"';
-            }else{
-                return '';
-            }
         }
 
         /*
@@ -407,6 +430,43 @@
         }
 
         /*
+         * Вызывает обработку каждого элемента массива функцией getRTmpl 
+         * Возвращает содержимое файла шаблона с замененными переменными в массиве $arr
+         * Параметры:
+         * $template - название шаблона
+         * $data - массив с данными для обработки
+         * $index_name - название индекса при передаче на обработку; если параметр соответствует null, то индекс не передается
+         * $str_data_name - в какую ячейку поместить данные, если это не массив
+         * $str_ret - результат работы; true - строка, false - массив
+         * $from - с какого элемента массива начать обработку
+         * $count - сколько элементов массива обрабатывать
+         */
+
+        public static function getMTmpl($template, $data, $data_preset, $index_name = 'index', $str_data_name = 'data', $str_ret = true,$from = null, $count = null){
+            
+            if($from !== null){
+                array_slice($data, $from, $count, true);
+            }
+            
+            if(!self::isTmpl($template)){
+                return self::translate('MULTI_TEMPLATE_NOT_FOUND');
+            }
+            $return = $str_ret ? '' : array();
+            foreach($data as $index => $arr){
+                if(is_string($arr)){
+                    $arr = array($str_data_name => $arr);
+                }
+                $arr = $arr + $data_preset;
+                if($str_ret){
+                    $return .= self::getRTmpl($template, $arr + ($index_name === null ? array() : array($index_name => $index)));
+                }else{
+                    $return[] = self::getRTmpl($template, $arr + ($index_name === null ? array() : array($index_name => $index)));
+                }
+            }
+            return $return;
+        }
+
+        /*
          * Возвращает содержимое файла шаблона с замененными переменными в массиве $arr
          * Массив $arr = ['key'=>'value']
          * Содержимое файла шаблона: '[key]'
@@ -415,20 +475,21 @@
 
         public static function getRTmpl($name, $arr){
             if(!self::isTmpl($name)){
-                $return = '<p>Во вроемя вывода шаблона возникла ошибка, но вам было передано следующее:</p>';
-                if(!is_array($arr)){
-                    return $return;
+                if(PICCOLO_SYSTEM_DEBUG){
+                    return self::translate('REPLACABLE_TEMPLATE_NOT_FOUND_DEBUG_START')
+                            . $name
+                            . self::translate('REPLACABLE_TEMPLATE_NOT_FOUND_DEBUG_END');
                 }
-                foreach($arr as $code => $val){
-                    $return .= '<p>$code: <br/>$val</p>';
-                }
-                return '<div>' . $return . '</div>';
+                return self::translate('REPLACABLE_TEMPLATE_NOT_FOUND');
             }else{
                 $return = self::getTmpl($name);
                 if(!is_array($arr)){
                     return $return;
                 }
                 foreach($arr as $code => $val){
+                    if(is_array($code) || is_array($val)){
+                        continue;
+                    }
                     $return = str_replace('[' . $code . ']', $val, $return);
                 }
                 return $return;
