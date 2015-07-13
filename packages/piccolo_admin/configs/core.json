@@ -1,0 +1,7 @@
+{
+    "scripts":{
+        "admin":{
+            "file":"piccolo_admin"
+        }
+    }
+}

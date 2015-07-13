@@ -1,0 +1,6 @@
+{
+    "title":"Русская локализация административной панели",
+    "locales":[
+        {"file_in":"admin_locale.ini","file_out":"piccolo_admin.ini","mode":"merge"}
+    ]
+}
