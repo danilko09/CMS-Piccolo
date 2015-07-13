@@ -1,0 +1,6 @@
+{
+    "title":"Русская локализация для блогового движка (piccolo_blog)",
+    "locales":[
+        {"file_in":"piccolo_blog_admin_locale_ru-RU.ini","file_out":"piccolo_blog_admin.ini"}
+    ]
+}
