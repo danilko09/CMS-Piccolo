@@ -1,0 +1,8 @@
+{
+    "scripts":{
+        "comments":{
+            "file":"piccolo_comments",
+            "autoload":"1"
+        }
+    }
+}
