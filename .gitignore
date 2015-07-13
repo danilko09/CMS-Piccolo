@@ -1,3 +1,7 @@
+# piccolo auto installation scripts (developer tools)
+index.php
+packages/install.json
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
