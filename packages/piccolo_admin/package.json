@@ -1,0 +1,17 @@
+{
+    "title":"Административная панель CMS Piccolo",
+    "requires":["page_data","users_base","min_auth","piccolo_permissions"],
+    "configs":[
+        {"file_in":"configs/core.json","file_out":"piccolo_core.json","mode":"merge"},
+        {"file_in":"configs/config.json","file_out":"piccolo_admin.json","mode":"new"},
+        {"file_in":"configs/page_data.json","file_out":"page_data.json","mode":"merge"}
+    ],
+    "scripts":[
+        {"file_in":"admin.php","file_out":"piccolo_admin.php","mode":"replace"}
+    ],
+    "templates":[
+        {"file_in":"templates/link.html","file_out":"admin/link.html","mode":"replace"},
+        {"file_in":"templates/list.html","file_out":"admin/list.html","mode":"new"},
+        {"file_in":"templates/first_login.html","file_out":"admin/first_start.html","mode":"new"}
+    ]
+}
