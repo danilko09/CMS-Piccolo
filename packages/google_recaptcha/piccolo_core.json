@@ -1,0 +1,9 @@
+{
+    "scripts":{
+        "google_recaptcha":{
+            "file":"google_recaptcha",
+            "admin_category":"users",
+            "admin_title":"Настроить ReCaptcha"
+        }
+    }
+}
