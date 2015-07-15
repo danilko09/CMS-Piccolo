@@ -4,7 +4,7 @@
     define('PICCOLO_START_MICROTIME', microtime(true));
 
     //Системная информация
-    define('PICCOLO_CORE_BUILD', '6'); //Версия ядра
+    define('PICCOLO_CORE_BUILD', '7'); //Версия ядра
     define('PICCOLO_WORKS', true); //Пометка, что работает именно CMS Piccolo
     define('PICCOLO_WSE_STAFF', true); //Минимальная совместимость с MSC: WebSiteEngine (вкл/вкл)
     define('PICCOLO_SYSTEM_DEBUG', true); //Режим отладки (вкл/вкл)
@@ -13,6 +13,7 @@
     define('PICCOLO_CMS_DIR', PICCOLO_ROOT_DIR . DIRECTORY_SEPARATOR . 'piccolo'); //Папка с файлами CMS
     define('PICCOLO_CMS_URL', '/piccolo'); //Внешний URI папки с файлами CMS
     define('PICCOLO_CONFIGS_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'config'); //Папка с конфигурационными файлами
+    define('PICCOLO_DATA_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'data'); //Папка с пользовательскими данными
     define('PICCOLO_TEMPLATES_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'templates'); //Папка с файлами шаблонов оформления страниц
     define('PICCOLO_TEMPLATES_URL', PICCOLO_CMS_URL . '/templates'); //Внешний URI папки с шаблонами
     define('PICCOLO_SCRIPTS_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'scripts'); //Папка с расширениями (моудялми) системы
@@ -55,6 +56,7 @@
             session_start(); //Запускаем сессию
             //Грузим конфиг
             self::$config = self::loadConfig('piccolo_core');
+            spl_autoload_register(__NAMESPACE__ .'\PICCOLO_ENGINE::checkScript'); //Указываем __autoload
             self::autoload(); //Проводим авто-загрузку скриптов
             if(filter_input(INPUT_GET, 'ajax') == '1'){//Если ajax-запрос
                 echo self::GetContentByTag(filter_input_array(INPUT_GET)); //Выводим данные
@@ -163,8 +165,8 @@
             if($alias == '' || $alias == null || $info === false){//Проверяем название и наличие записи в конфиге ядра
                 return false;
             }
-            if(isset(self::$loaded[$alias]) && self::$loaded[$alias] == true){//Если уже загружен, то сразу отвечаем, что всё ок
-                return true;
+            if(isset(self::$loaded[$alias])){//Если уже есть кеш, то выдаем его
+                return (boolean) self::$loaded[$alias];
             }
             $file = isset($info['file']) ? $info['file'] : $alias; //Определяем имя файла
             if(!is_file(PICCOLO_SCRIPTS_DIR . DIRECTORY_SEPARATOR . $file . '.php') || (isset($info['need_wse']) && !PICCOLO_WSE_STAFF)){
@@ -175,9 +177,11 @@
                 return false;
             }
             if(method_exists($alias, 'onLoad')){//Автозагрузка скрипта: если метод onLoad есть, то вызываем его
-                $alias::onLoad();
+                self::$loaded[$alias] = $alias::onLoad();
             }
-            self::$loaded[$alias] = true; //Отмечаем скрипт как загруженный
+            if(!isset(self::$loaded[$alias]) || self::$loaded[$alias] === null){//Если функция ничего не вернула или нет autoload
+                self::$loaded[$alias] = true; //Отмечаем скрипт как успешно загруженный
+            }
             return true; //Отвечаем, что скрипт загрузился успешно
         }
 
@@ -244,6 +248,25 @@
 
         public static function updateConfig($config, $data){
             file_put_contents(PICCOLO_CONFIGS_DIR . DIRECTORY_SEPARATOR . $config . '.json', json_encode($data));
+        }
+        
+        /*
+         * Загружает данные
+         * Возвращает содержимое JSON в виде массива
+         */
+
+        public static function loadData($config){
+            return is_file(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $config . '.json') ? json_decode(file_get_contents(PICCOLO_CONFIGS_DIR . DIRECTORY_SEPARATOR . $config . '.json'), true)
+                        : array();
+        }
+
+        /*
+         * Обновляет данные
+         * Полностью перезаписывает содержимое JSON содержимым в переданном массиве (Если что-то отсутствует в массиве, то оно будет удалено)
+         */
+
+        public static function updateData($config, $data){
+            file_put_contents(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $config . '.json', json_encode($data));
         }
 
         //Локализации
