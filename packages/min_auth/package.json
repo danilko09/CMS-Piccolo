@@ -1,0 +1,22 @@
+{
+    "title": "Минимальный скрипт авторизации",
+    "configs": [{
+            "file_in": "core.json",
+            "file_out": "piccolo_core.json",
+            "mode": "merge"
+        }],
+    "scripts": [{
+            "file_in": "min_auth.php",
+            "file_out": "min_auth.php",
+            "mode": "replace"
+        }],
+    "templates": [{
+            "file_in": "form.html",
+            "file_out": "scripts/min_auth/form.html",
+            "mode": "replace"
+        },{
+            "file_in": "admin.html",
+            "file_out": "scripts/min_auth/admin.html",
+            "mode": "new"
+        }]
+}

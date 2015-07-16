@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "min_auth": {
+            "file": "min_auth",
+            "admin_category": "users",
+            "admin_title": "Настроить пакет авторизации min_auth"
+        }
+    }
+}
