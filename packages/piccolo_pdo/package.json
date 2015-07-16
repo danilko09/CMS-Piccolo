@@ -1,0 +1,18 @@
+{
+    "title": "Библиотека для централизованной работы с PDO",
+    "configs": [{
+            "file_in": "piccolo_core.json",
+            "file_out": "piccolo_core.json",
+            "mode": "merge"
+        }, {
+            "file_in": "piccolo_pdo.json",
+            "file_out": "piccolo_pdo.json",
+            "mode": "new"
+        }],
+    "scripts": [{
+            "file_in": "p_pdo.php",
+            "file_out": "p_pdo.php",
+            "mode": "replace"
+        }]
+
+}
