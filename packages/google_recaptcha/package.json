@@ -1,0 +1,25 @@
+{
+    "title": "Google ReCaptcha 2",
+    "requires": ["piccolo_admin"],
+    "configs": [{
+            "file_in": "piccolo_core.json",
+            "file_out": "piccolo_core.json",
+            "mode": "merge"
+        }],
+    "scripts": [{
+            "file_in": "google_recaptcha.php",
+            "file_out": "google_recaptcha.php",
+            "mode": "replace"
+        },{
+            "file_in": "lib.php",
+            "file_out": "google_recaptcha/lib.php",
+            "mode": "replace"
+        }],
+    "templates": [
+        {
+            "file_in":"admin_forms.html",
+            "file_out":"scripts/google_recaptcha/admin_forms.html",
+            "mode":"replace"
+        }
+    ]
+}
