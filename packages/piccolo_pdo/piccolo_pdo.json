@@ -1,0 +1,8 @@
+{
+    "dsn": "mysql:host=localhost;dbname=site;charset=utf8",
+    "connect_info": {
+        "username": "root",
+        "password": "root",
+        "prefix": ""
+    }
+}
