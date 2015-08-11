@@ -1,0 +1,15 @@
+{
+    "title":"Хлебные крошки для сайта",
+    "scripts":[
+        {"file_in":"breadcrumbs.php","file_out":"piccolo_breadcrumbs.php","mode":"replace"}
+    ],
+    "templates":[
+        {"file_in":"templates/default.html","file_out":"piccolo_breadcrumbs/styles/default.html","mode":"new"},
+        {"file_in":"templates/default_element.html","file_out":"piccolo_breadcrumbs/styles/default_element.html","mode":"new"},
+        {"file_in":"templates/default_element_active.html","file_out":"piccolo_breadcrumbs/styles/default_element_active.html","mode":"new"}
+    ],
+    "configs":[
+        {"file_in":"core.json","file_out":"piccolo_core.json","mode":"merge"},
+        {"file_in":"config.json","file_out":"piccolo_breadcrumbs.json","mode":"merge"}
+    ]
+}
