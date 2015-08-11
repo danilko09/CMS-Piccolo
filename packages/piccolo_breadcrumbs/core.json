@@ -1,0 +1,8 @@
+{
+    "scripts":{
+        "breadcrumbs":{
+            "file":"piccolo_breadcrumbs",
+            "autoload":"1"
+        }
+    }
+}
