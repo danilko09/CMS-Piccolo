@@ -1,0 +1,13 @@
+<style>
+    #feedback_message {
+        height: 150px;
+    }
+</style>
+<form method="POST">
+    [message]
+    <input type="hidden" name="feedback_message_hidden" value="1"/>
+    <input type="text" name="name" placeholder="Ваше имя" class="form-control"/><br/>
+    <input type="email" name="email" placeholder="Ваш E-mail" class="form-control"/><br/>
+    <textarea name="message" placeholder="Ваше сообщение" class="form-control" id="feedback_message"></textarea><br/>
+    <input type="submit" value="Отправить" class="form-control btn btn-success"/>
+</form>
