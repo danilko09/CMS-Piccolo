@@ -133,10 +133,10 @@
             }else{
                 self::$uri = array('');
             }//Если же часть одна, то оставляем uri с одной пустой строкой
-            $c_url = 'http://' . self::getSrvInf('HTTP_HOST') . self::getSrvInf('REQUEST_URI'); //Получаем точный URL
+            $c_url = 'http://' . self::getSrvInf('HTTP_HOST') . urldecode(self::getSrvInf('REQUEST_URI')); //Получаем точный URL
             self::$url = rtrim($c_url, '?' . self::getSrvInf('QUERY_STRING')); //Отсекаем GET-параметры и сохраняем
-			$no_index = $url[1] !== '/' ? str_replace($url[1], '', self::$url) : self::$url;//Отсекаем файл index.php в url
-            self::$index = rtrim($no_index,'/'); //Получаем index и сохраняем
+			
+			self::$index = $url[1] == '' ? rtrim(self::$url,'/') : substr(self::$url,0,strripos(self::$url,$url[1]));
 			
         }
 
@@ -254,10 +254,21 @@
          */
 
         public static function updateConfig($config, $data){
+            if(!is_dir(dirname(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $config . '.json'))){
+				mkdir(dirname(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $config . '.json'), 0777, true);
+			}
             file_put_contents(PICCOLO_CONFIGS_DIR . DIRECTORY_SEPARATOR . $config . '.json', json_encode($data));
         }
         
-        /**
+		/**
+		 * Проверяет существование файла с данными в БД
+		 * @param type $path относительный путь до файла
+		 */
+		public static function isData($path){
+		    return is_file(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $path . '.json');
+        }
+		
+		/**
          * Загружает данные
          * Возвращает содержимое JSON в виде массива
          */
@@ -499,11 +510,11 @@
                 if(is_string($arr)){
                     $arr = array($str_data_name => $arr);
                 }
-                $arr = $arr + $data_preset;
+                $arr = ($index_name === null ? array() : array($index_name => $index)) + $arr + $data_preset;
                 if($str_ret){
-                    $return .= self::getRTmpl($template, $arr + ($index_name === null ? array() : array($index_name => $index)));
+                    $return .= self::getRTmpl($template, $arr);
                 }else{
-                    $return[] = self::getRTmpl($template, $arr + ($index_name === null ? array() : array($index_name => $index)));
+                    $return[] = self::getRTmpl($template, $arr);
                 }
             }
             return $return;
