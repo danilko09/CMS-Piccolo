@@ -763,7 +763,13 @@ STAGE5
          */
 
         public function merge_array($arr1, $arr2){
-            foreach($arr2 as $key => $value){
+			if(!is_array($arr1)){
+				return $arr2;
+			}
+			if(!is_array($arr2)){
+				return $arr1;
+			}
+			foreach($arr2 as $key => $value){
                 if(!isset($arr1[$key])){
                     $arr1[$key] = $value;
                 }elseif(is_array($arr1[$key]) && is_array($value)){
@@ -834,10 +840,11 @@ STAGE5
                     continue;
                 }
 
-                $in = parse_ini_file(file_get_contents($this->pckg . DIRECTORY_SEPARATOR . $file['file_in']), true);
-                $out = is_file($this->lc . DIRECTORY_SEPARATOR . $file['file_out']) ? parse_ini_file(file_get_contents($this->cfg . DIRECTORY_SEPARATOR . $file['file_out']), true)
+                $in = parse_ini_file($this->pckg . DIRECTORY_SEPARATOR . $file['file_in'], true);
+				
+                $out = is_file($this->lc . DIRECTORY_SEPARATOR . $file['file_out']) ? parse_ini_file($this->lc . DIRECTORY_SEPARATOR . $file['file_out'], true)
                             : array();
-
+            
                 mkdir(dirname($this->lc . DIRECTORY_SEPARATOR . $file['file_out']), 0777, true);
                 file_put_contents($this->lc . DIRECTORY_SEPARATOR . $file['file_out'], $this->arrToINI($this->merge_array($out, $in)));
             }
