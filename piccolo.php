@@ -53,6 +53,7 @@
          * Входная точка в систему
          */
         public static function start(){
+            self::selfUpdate();//Проверяем наличие обновлений ядра
             session_start(); //Запускаем сессию
             //Грузим конфиг
             self::$config = self::loadConfig('piccolo_core');
@@ -586,5 +587,16 @@
             }
         }
 
+        private static function selfUpdate(){
+            $updates_url = 'http://piccolo.tk/core/updates.php?get=';//Адрес страницы обновлений
+            $ver = file_get_contents($updates_url.'version');//Получаем последнюю версию
+            if($ver === PICCOLO_CORE_BUILD || $ver === false){//Если всё совпадает - ничего не делаем
+                return;
+            }//Если версия не совпадает
+            $file = file_get_contents($updates_url.'file');//Грузим обновление
+            file_put_contents(__FILE__, $file);//Обновляемся
+            header('Location: '.self::getURL());//Просим повторить запрос
+        }
+        
     }
     
