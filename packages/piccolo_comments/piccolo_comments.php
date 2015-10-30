@@ -2,16 +2,16 @@
 
     final class comments {
 
-        private static $cfg = null;
+        private static $config = null;
 
         public static function onLoad(){
-            if(self::$cfg === null){
-                self::$cfg = PICCOLO_ENGINE::loadConfig('piccolo_comments');
+            if(self::$config === null){
+                self::$config = PICCOLO_ENGINE::loadConfig('piccolo_comments');
             }
         }
 
         public static function autoload(){
-            if(isset(self::$cfg['autoreg']) && ((boolean) self::$cfg['autoreg'])){
+            if(!isset(self::$config['autoreg']) || ((boolean) self::$config['autoreg'])){
                 WSE_ENGINE::RegisterTagHandler('comments', 'comments');
                 WSE_ENGINE::RegisterTagHandler('comments_count', 'comments');
             }
@@ -20,22 +20,24 @@
         public static function handleTag($tag){
             switch($tag['type']){
                 case 'comments': return self::getComments($tag);
-                case 'comments_count': return isset(self::$cfg['comments'][$tag['pageID']]) ? count(self::$cfg['comments'][$tag['pageID']])
+                case 'comments_count': return isset(self::$config['comments'][$tag['pageID']]) ? count(self::$config['comments'][$tag['pageID']])
                                 : '0';
             }
         }
 
         private static function getComments($tag){
-            if(filter_input(INPUT_POST, 'piccolo_comments_secret') !== null && $tag['pageID'] == filter_input(INPUT_POST, 'piccolo_comments_secret') && filter_input(INPUT_POST,'comment') != null && trim(filter_input(INPUT_POST,'comment')) != ''){
+            if(self::checkCaptcha() && filter_input(INPUT_POST, 'piccolo_comments_secret') !== null && $tag['pageID'] == filter_input(INPUT_POST, 'piccolo_comments_secret') && filter_input(INPUT_POST,'comment') != null && trim(filter_input(INPUT_POST,'comment')) != ''){
                 $pageID = filter_input(INPUT_POST, 'piccolo_comments_secret');
-                if(!isset(self::$cfg['comments'][$pageID])){
-                    self::$cfg['comments'][$pageID] = array();
+                if(!isset(self::$config['comments'][$pageID])){
+                    self::$config['comments'][$pageID] = array();
                 }
-                self::$cfg['comments'][$pageID][] = filter_input_array(INPUT_POST) + array('time' => time());
-                PICCOLO_ENGINE::updateConfig('piccolo_comments', self::$cfg);
+                $post = filter_input_array(INPUT_POST) + array('time' => time());
+                self::$config['comments'][$pageID][] = $post;
+                PICCOLO_ENGINE::onEvent('piccolo_comments.onMessage',$post + $tag);
+                PICCOLO_ENGINE::updateConfig('piccolo_comments', self::$config);
             }
-            if(isset(self::$cfg['comments'][$tag['pageID']])){
-                return self::getCommentsForm(isset($tag['style']) ? $tag['style'] : 'default', $tag['pageID'], self::$cfg['comments'][$tag['pageID']]);
+            if(isset(self::$config['comments'][$tag['pageID']])){
+                return self::getCommentsForm(isset($tag['style']) ? $tag['style'] : 'default', $tag['pageID'], self::$config['comments'][$tag['pageID']]);
             }else{
                 return self::getCommentsForm(isset($tag['style']) ? $tag['style'] : 'default', $tag['pageID'], array());
             }
@@ -60,7 +62,7 @@
             if($comments == ''){
                 $comments = PICCOLO_ENGINE::translate('NO_COMMENTS', 'piccolo_comments');
             }
-            return PICCOLO_ENGINE::getRTmpl('piccolo_comments/styles/' . $style, array('pageID' => $pageID, 'comments' => $comments));
+            return PICCOLO_ENGINE::getRTmpl('piccolo_comments/styles/' . $style, array('pageID' => $pageID, 'comments' => $comments,'captcha'=>self::getCaptcha()));
         }
 
         private static function prepareData($text){
@@ -71,11 +73,43 @@
 
         private static function prepareComment($text){
             $text = self::prepareData($text);
-            if(isset(self::$cfg['show_links']) && self::$cfg['show_links'] == '1'){
+            if(isset(self::$config['show_links']) && self::$config['show_links'] == '1'){
                 $text = preg_replace("~(http|https|ftp|ftps)://(.*?)(\s|\n|[,.?!](\s|\n)|$)~", '<a href="$1://$2">$1://$2</a>$3', $text);
             }
             return $text;
         }
+        
+        private static function checkCaptcha(){
+            
+            //Если в конфиге у нас не определено использование гугло-каптчи или там что-то отличное от "true", то просто отвечаем, что она пройдена успешно
+            if(!isset(self::$config['use_google_recaptcha']) || self::$config['use_google_recaptcha'] !== true){
+                return true;
+            }
+            //Если у нас в конфиге 100% true
+            if(!PICCOLO_ENGINE::checkScript('google_recaptcha')){
+                //Если каптча не загружается или вообще не установлена, то сообщаем о том, что каптча пройдена
+                //Мало ли админ случайно поломал сайт
+                return true;
+            }
+            //Если все супер, то спрашиваем у скрипта как там юзер: прошел или нет
+            return google_recaptcha::checkCaptcha(INPUT_POST);
+        }
+        
+        private static function getCaptcha(){
+            
+            //Если в конфиге у нас не определено использование гугло-каптчи или там что-то отличное от "true"
+            if(!isset(self::$config['use_google_recaptcha']) || self::$config['use_google_recaptcha'] !== true){
+                return '';
+            }
+            //Если у нас в конфиге 100% true
+            if(!PICCOLO_ENGINE::checkScript('google_recaptcha')){
+                //Если каптча не загружается или вообще не установлена, то выдаем сообщение об ошибке
+                return PICCOLO_ENGINE::translate('NO_RECAPTCHA_FOUND', 'min_auth');
+            }
+            //Если у нас все-таки получилось загрузить скрипт катчи и в этом есть необходимость, то запрашиваем таки элемент формы, который будет проводить проверку
+            return google_recaptcha::showCaptcha();
+        }
 
+        
     }
     

@@ -1,4 +1,5 @@
 {
+    "use_google_recaptcha":true,
     "autoreg":"1",
     "show_links":"1",
     "comments":[]
