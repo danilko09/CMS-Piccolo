@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "last_comments":{
+            "file":"last_comments",
+            "autoload":"1",
+            "events":"piccolo_comments.onMessage"
+        }
+    }
+}
