@@ -1,0 +1,13 @@
+{
+    "title":"Компонент \"Регистрация\"",
+    "requires":["users_base"],
+    "templates":[
+        {"file_in":"form.html","file_out":"registration.html","mode":"new"}
+    ],
+    "scripts":[
+        {"file_in":"reg.php","file_out":"piccolo_registration.php","mode":"replace"}
+    ],
+    "configs":[
+        {"file_in":"core.json","file_out":"piccolo_core.json","mode":"merge"}
+    ]
+}
