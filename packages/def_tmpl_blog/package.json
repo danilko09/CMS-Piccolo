@@ -1,6 +1,6 @@
 {
-    "title":"Стандартный шаблон оформления блога",
-    "requires":["page_data","piccolo_breadcrumbs"],
+    "title":"Стандартный шаблон оформления (блог)",
+    "requires":["page_data","piccolo_breadcrumbs","piccolo_comments"],
     "templates":[
         {"file_in":"template/css/blog-home.css","file_out":"css/blog-home.css"},
         {"file_in":"template/css/bootstrap.css","file_out":"css/bootstrap.css"},
