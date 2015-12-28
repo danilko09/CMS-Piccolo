@@ -1,0 +1,17 @@
+{
+    "title":"Обратная связь",
+    "scripts":[
+        {"file_in":"feedback.php","file_out":"feedback.php","mode":"replace"}
+    ],
+    "templates":[
+        {"file_in":"tmpl/form.html","file_out":"scripts/feedback/form.html","mode":"replace"},
+        {"file_in":"tmpl/feedback_send_message.html","file_out":"scripts/feedback/form_send_message.html","mode":"replace"},
+        {"file_in":"tmpl/feedback_must_have_message.html","file_out":"scripts/feedback/form_must_have_message.html","mode":"replace"},
+        
+        {"file_in":"tmpl/admin/list_page_frame.html","file_out":"scripts/feedback/admin/list_page_frame.html","mode":"replace"},
+        {"file_in":"tmpl/admin/list_page_element.html","file_out":"scripts/feedback/admin/list_page_element.html","mode":"replace"}
+    ],
+    "configs":[
+        {"file_in":"cfg/core.json","file_out":"piccolo_core.json","mode":"merge"}
+    ]
+}

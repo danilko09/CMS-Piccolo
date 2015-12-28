@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "feedback":{
+            "file":"feedback",
+            "admin_category":"users",
+            "admin_title":"Просмотр сообщений обратной связи"
+        }
+    }
+}

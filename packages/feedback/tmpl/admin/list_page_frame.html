@@ -1,0 +1,10 @@
+<h3>Обратная связь <small>принятые сообщения</small></h3>
+[elements]
+<div class="col-md-12">
+<dl class="dl-horizontal">
+    <dt>Всего сообщений</dt> <dd>[messages_count]</dd>
+    <dt>Текущая страница</dt> <dd>[page]</dd>
+    <dt>Всего страниц</dt> <dd>[pages_count]<dd>
+        </dl>
+Открыть страницу № <input type="text" onkeyup="$('#pager_link').attr('href','[base]/'+$(this).val());"> <a href="#" id="pager_link" class="btn btn-default">перейти</a>
+</div>
