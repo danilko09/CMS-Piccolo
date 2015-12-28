@@ -1,0 +1,8 @@
+{
+    "scripts":{
+        "piccolo_registration":{
+            "file":"piccolo_registration",
+            "actions":["showRegForm"]
+        }
+    }
+}
