@@ -20,27 +20,23 @@
         public static function handleTag($tag){
             switch($tag['type']){
                 case 'comments': return self::getComments($tag);
-                case 'comments_count': return isset(self::$config['comments'][$tag['pageID']]) ? count(self::$config['comments'][$tag['pageID']])
-                                : '0';
+                case 'comments_count': 
+                    return self::anyComments($tag['pageID']) ? count(self::loadComments($tag['pageID'])) : '0';
             }
         }
 
         private static function getComments($tag){
             if(self::checkCaptcha() && filter_input(INPUT_POST, 'piccolo_comments_secret') !== null && $tag['pageID'] == filter_input(INPUT_POST, 'piccolo_comments_secret') && filter_input(INPUT_POST,'comment') != null && trim(filter_input(INPUT_POST,'comment')) != ''){
                 $pageID = filter_input(INPUT_POST, 'piccolo_comments_secret');
-                if(!isset(self::$config['comments'][$pageID])){
-                    self::$config['comments'][$pageID] = array();
-                }
                 $post = filter_input_array(INPUT_POST) + array('time' => time());
-                self::$config['comments'][$pageID][] = $post;
+                self::addComment($pageID, $post);
                 PICCOLO_ENGINE::onEvent('piccolo_comments.onMessage',$post + $tag);
                 PICCOLO_ENGINE::updateConfig('piccolo_comments', self::$config);
             }
-            if(isset(self::$config['comments'][$tag['pageID']])){
-                return self::getCommentsForm(isset($tag['style']) ? $tag['style'] : 'default', $tag['pageID'], self::$config['comments'][$tag['pageID']]);
-            }else{
-                return self::getCommentsForm(isset($tag['style']) ? $tag['style'] : 'default', $tag['pageID'], array());
-            }
+
+            $style = isset($tag['style']) ? $tag['style'] : 'default';
+            return self::getCommentsForm($style, $tag['pageID'], self::loadComments($tag['pageID']));
+
         }
 
         private static function getCommentsForm($style, $pageID, $comments_arr){
@@ -65,6 +61,30 @@
             return PICCOLO_ENGINE::getRTmpl('piccolo_comments/styles/' . $style, array('pageID' => $pageID, 'comments' => $comments,'captcha'=>self::getCaptcha()));
         }
 
+        private static function addComment($pageID,$comment){
+            self::migrate_if_need($pageID);
+            $data[] = $comment;
+            PICCOLO_ENGINE::updateData('piccolo_comments/'.$pageID, $data);
+        }
+        
+        private static function loadComments($pageID){
+            self::migrate_if_need($pageID);
+            return PICCOLO_ENGINE::loadData('piccolo_comments/'.$pageID);
+        }
+        
+        private static function anyComments($pageID){
+            self::migrate_if_need($pageID);
+            return PICCOLO_ENGINE::isData('piccolo_comments/'.$pageID);
+        }
+
+        private static function migrate_if_need($pageID){
+            if(isset(self::$config['comments'][$pageID])){
+                PICCOLO_ENGINE::updateData('piccolo_comments/'.$pageID, self::$config['comments'][$pageID]);
+                unset(self::$config['comments'][$pageID]);
+                PICCOLO_ENGINE::updateConfig('piccolo_comments', self::$config);
+            }
+        }
+        
         private static function prepareData($text){
             $text = htmlspecialchars($text);
             $text = str_replace(array('[', ']'), array('&#091;', '&#093;'), $text);
