@@ -1,0 +1,13 @@
+{
+    "title":"Скрипт распределения URI",
+    "templates":[
+        {"file_in":"templates/404.html","file_out":"404.html","mode":"new"}
+    ],
+    "scripts":[
+        {"file_in":"scripts/page_data.php","file_out":"page_data.php","mode":"replace"}
+    ],
+    "configs":[
+        {"file_in":"configs/piccolo_core.json","file_out":"piccolo_core.json","mode":"merge"},
+        {"file_in":"configs/page_data.json","file_out":"page_data.json","mode":"new"}
+    ]
+}

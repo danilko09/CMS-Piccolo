@@ -1,0 +1,74 @@
+{
+    "title":"Редактор статических и динамических страниц",
+    "requires":["piccolo_admin","page_data","page_data_admin_locale_ru-RU"],
+    "scripts": [
+        {
+            "file_in": "page_data_static_admin.php",
+            "file_out": "page_data_static_admin.php",
+            "mode": "replace"
+        },
+        {
+            "file_in": "page_data_dynamic_admin.php",
+            "file_out": "page_data_dynamic_admin.php",
+            "mode": "replace"
+        }
+    ],
+    "configs": [
+        {
+            "file_in": "core.json",
+            "file_out": "piccolo_core.json",
+            "mode": "merge"
+        }
+    ],
+    "templates": [
+        {
+            "file_in": "templates/static_list.html",
+            "file_out": "scripts/page_data/admin/static_list.html",
+            "mode": "new"
+        },
+        {
+            "file_in": "templates/add_form.html",
+            "file_out": "scripts/page_data/admin/add_form.html",
+            "mode": "new"
+        },
+        {
+            "file_in": "templates/edit_form.html",
+            "file_out": "scripts/page_data/admin/edit_form.html",
+            "mode": "new"
+        },
+        {
+            "file_in": "templates/remove_form.html",
+            "file_out": "scripts/page_data/admin/remove_form.html",
+            "mode": "new"
+        },
+        {
+            "file_in": "templates/slink.html",
+            "file_out": "scripts/page_data/admin/slink.html",
+            "mode": "new"
+        },
+        
+        {
+            "file_in": "templates/dlink.html",
+            "file_out": "scripts/page_data/admin/dlink.html",
+            "mode": "replace"
+        },
+        
+        {
+            "file_in": "templates/dframe.html",
+            "file_out": "scripts/page_data/admin/dframe.html",
+            "mode": "replace"
+        },
+        
+        {
+            "file_in": "templates/dscript.html",
+            "file_out": "scripts/page_data/admin/dscript.html",
+            "mode": "replace"
+        },
+        
+        {
+            "file_in": "templates/message.html",
+            "file_out": "scripts/page_data/admin/message.html",
+            "mode": "replace"
+        }
+    ]
+}
