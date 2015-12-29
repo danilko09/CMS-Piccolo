@@ -1,5 +1,5 @@
 {
-    "title": "Минимальный скрипт авторизации",
+    "title": "Компонент \"Авторизация\"",
     "configs": [{
             "file_in": "core.json",
             "file_out": "piccolo_core.json",
