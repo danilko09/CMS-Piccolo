@@ -13,6 +13,11 @@
             "file_in": "p_pdo.php",
             "file_out": "p_pdo.php",
             "mode": "replace"
-        }]
+        }],
+    "templates":[
+        {"file_in":"settings.html","file_out":"scripts/piccolo_pdo/settings.html","mode":"replace"},
+        {"file_in":"saved.html","file_out":"scripts/piccolo_pdo/settings_saved.html","mode":"replace"}
+    ]
+    
 
 }
