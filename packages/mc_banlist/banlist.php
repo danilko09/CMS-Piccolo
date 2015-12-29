@@ -28,7 +28,17 @@ class mc_banlist {
             'scriptname'=>__CLASS__
             ));
     }
+
+    public static function showLines($params = array()){
     
+        $res = self::getPage($params);
+        
+        $table = PICCOLO_ENGINE::getMTmpl('mc_banlist/table_line', $res, array('name'=>''));
+        
+        return $table;
+        
+    }
+
     private static function getPage($params){
         $count = isset(self::$cfg['on_page']) ? self::$cfg['on_page'] : isset($params['on_page']) ? $params['on_page'] : 10;
         $page = isset($params['page']) ? $params['page'] : 1;
@@ -36,7 +46,7 @@ class mc_banlist {
         
         if(!PICCOLO_ENGINE::checkScript('piccolo_pdo')){return 'NO_PDO';}
         $PDO = piccolo_pdo::getPDO();
-        $stmt = $PDO->prepare('SELECT * FROM banlist ORDER BY time DESC');
+        $stmt = $PDO->prepare('SELECT * FROM banlist ORDER BY time DESC LIMIT '.((int) $from).','.((int) $count));
         $stmt->execute();
         $result = $stmt->fetchAll();
         $table = array();

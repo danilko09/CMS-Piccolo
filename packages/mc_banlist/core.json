@@ -4,7 +4,7 @@
             "file":"mc_banlist",
             "admin_category":"minecraft",
             "admin_title":"Банлист",
-            "actions":["showList","showMore"]
+            "actions":["showList","showLines"]
         }
     }
 }

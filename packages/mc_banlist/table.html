@@ -2,7 +2,43 @@
     <thead>
         <tr><th>Игрок</th><th>Забанил</th><th>Дата бана</th><th>Дата разбана</th><th>Причина бана</th></tr>
     </thead>
-    <tbody>
+    <tbody id="banlist_tbody">
         [lines]
     </tbody>
 </table>
+<button id="banlist_load_more" class="form-control btn btn-success">Загрузить ещё</button>
+<button id="banlist_loading" class="form-control btn btn-success disabled">Загрузка...</button>
+<script>
+    
+    var page = 2;
+    
+    $('#banlist_load_more').hide();
+
+    $.get("%index%?ajax=1&type=script&name=mc_banlist&action=showLines&page="+page, function (data) {
+        if(data !== ''){
+            $('#banlist_load_more').show();
+        }
+        $('#banlist_loading').hide();
+    });
+
+
+    $('#banlist_load_more').on('click', function () {
+
+        $('#banlist_load_more').hide();
+        $('#banlist_loading').show();
+
+        $.get("%index%?ajax=1&type=script&name=mc_banlist&action=showLines&page="+page, function (data) {
+            $('#banlist_tbody').append(data);
+            page++;
+        });
+       
+        
+        $.get("%index%?ajax=1&type=script&name=mc_banlist&action=showLines&page="+(page+1), function (data) {
+            if(data !== ''){
+                $('#banlist_load_more').show();
+            }
+            $('#banlist_loading').hide();
+        });
+        
+    });
+</script>

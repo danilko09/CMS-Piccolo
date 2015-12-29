@@ -1,6 +1,7 @@
 {
     
     "requires":["piccolo_pdo"],
+    "title":"Список заблокированных (minecraft)",
     
     "configs":[
         {"file_in":"core.json","file_out":"piccolo_core.json","mode":"merge"}
