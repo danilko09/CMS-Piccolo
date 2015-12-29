@@ -1,0 +1,19 @@
+<form method="POST">
+    [msg]
+    <input type="hidden" name="piccolo_blog_add_secret" value="1"/>
+    <div class="input-group">
+        <span class="input-group-addon">Название новости</span>
+        <input type="text" name="title" class="form-control"/>
+    </div><br/>
+    <div class="input-group">
+        <span class="input-group-addon">Автор:</span>
+        <input type="text" name="author" class="form-control"/>
+    </div><br/>
+    
+    Краткая новость:<br/>
+    <textarea name="content" class="form-control" style="height: 100px;"></textarea><br/>
+    Полная новость:<br/>
+    <textarea name="content_full" class="form-control" style="height: 300px;"></textarea><br/>
+    <i>Если в поле "полная новость" ничего не введено, то оно автоматически заполняется содержимым поля "краткая новость".</i><br/><br/>
+    <input type="submit" value="Опубликовать" class="form-control btn btn-success"/>
+</form>

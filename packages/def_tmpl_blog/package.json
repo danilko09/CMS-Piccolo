@@ -1,0 +1,36 @@
+{
+    "title":"Стандартный шаблон оформления (блог)",
+    "requires":["page_data","piccolo_breadcrumbs","piccolo_comments"],
+    "templates":[
+        {"file_in":"template/css/blog-home.css","file_out":"css/blog-home.css"},
+        {"file_in":"template/css/bootstrap.css","file_out":"css/bootstrap.css"},
+        {"file_in":"template/css/bootstrap.min.css","file_out":"css/bootstrap.min.css"},
+        
+        {"file_in":"template/fonts/glyphicons-halflings-regular.eot","file_out":"fonts/glyphicons-halflings-regular.eot"},
+        {"file_in":"template/fonts/glyphicons-halflings-regular.svg","file_out":"fonts/glyphicons-halflings-regular.svg"},
+        {"file_in":"template/fonts/glyphicons-halflings-regular.ttf","file_out":"fonts/glyphicons-halflings-regular.ttf"},
+        {"file_in":"template/fonts/glyphicons-halflings-regular.woff","file_out":"fonts/glyphicons-halflings-regular.woff"},
+        {"file_in":"template/fonts/glyphicons-halflings-regular.woff2","file_out":"fonts/glyphicons-halflings-regular.woff2"},
+        
+        {"file_in":"template/js/bootstrap.js","file_out":"js/bootstrap.js"},
+        {"file_in":"template/js/bootstrap.min.js","file_out":"js/bootstrap.min.js"},
+        {"file_in":"template/js/jquery.js","file_out":"js/jquery.js"},
+        
+        {"file_in":"template/demo.html","file_out":"demo.html","mode":"replace"},
+        {"file_in":"template/index.html","file_out":"index.html","mode":"replace"},
+        
+        {"file_in":"template/scripts/piccolo_blog/blog_post.html","file_out":"piccolo_blog/blog_post.html","mode":"new"},
+        {"file_in":"template/scripts/piccolo_blog/post_page.html","file_out":"piccolo_blog/post_page.html","mode":"new"},
+        
+        {"file_in":"template/piccolo_blog_admin/add_form.html","file_out":"piccolo_blog_admin/add_form.html","mode":"replace"},
+        
+        {"file_in":"template/scripts/piccolo_comments/styles/default.html","file_out":"piccolo_comments/styles/default.html","mode":"replace"},
+        {"file_in":"template/scripts/piccolo_comments/styles/default_comment.html","file_out":"piccolo_comments/styles/default_comment.html","mode":"replace"},
+        
+        {"file_in":"template/scripts/page_data/admin/slink.html","file_out":"page_data/admin/slink.html","mode":"new"},
+        {"file_in":"template/scripts/page_data/admin/static_list.html","file_out":"page_data/admin/static_list.html","mode":"new"},
+        {"file_in":"template/scripts/page_data/admin/add_form.html","file_out":"page_data/admin/add_form.html","mode":"new"},
+        {"file_in":"template/scripts/page_data/admin/edit_form.html","file_out":"page_data/admin/edit_form.html","mode":"new"},
+        {"file_in":"template/scripts/page_data/admin/remove_form.html","file_out":"page_data/admin/remove_form.html","mode":"new"}
+    ]
+}
