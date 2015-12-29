@@ -1,7 +1,9 @@
 {
     "scripts":{
         "piccolo_pdo":{
-            "file":"p_pdo"
+            "file":"p_pdo",
+            "admin_category":"system",
+            "admin_title":"настройки базы данных"
         }
     }
 }

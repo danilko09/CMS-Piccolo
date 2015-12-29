@@ -1,0 +1,19 @@
+[msg]
+<form method="POST">
+    <input type="hidden" name="pdo_settings_post" value="1"/>
+    <div class="input-group">
+        <span class="input-group-addon">DSN</span>
+    <input type="text" name="dsn" value="[dsn]" class="form-control"/>
+    </div>
+    Пример составления DSN: <b>mysql:host=%адрес_сервера_mysql%;dbname=%название_базы_данных%;charset=utf8</b>, где %адрес_сервера_mysql% и %название_базы_данных% необходимо заменить на ваши данные.
+    <br/><br/>
+    <div class="input-group">
+        <span class="input-group-addon">Имя пользователя</span>
+    <input type="text" name="username" value="[username]" class="form-control"/>
+    </div><br/>
+        <div class="input-group">
+        <span class="input-group-addon">Пароль</span>
+    <input type="password" name="password" value="[password]" class="form-control"/>
+    </div><br/>
+    <input type="submit" value="Сохранить" class="form-control btn btn-success"/>
+</form>
