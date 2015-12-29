@@ -1,0 +1,14 @@
+{
+    "scripts":{
+        "page_data_static_admin":{
+            "file":"page_data_static_admin",
+            "admin_category":"pages",
+            "admin_title":"Редактор статических страниц"
+        },
+        "page_data_dynamic_admin":{
+            "file":"page_data_dynamic_admin",
+            "admin_category":"pages",
+            "admin_title":"Редактор динамических страниц"
+        }
+    }
+}

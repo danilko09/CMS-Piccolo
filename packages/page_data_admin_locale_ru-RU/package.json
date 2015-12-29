@@ -1,0 +1,6 @@
+{
+    "title":"Русская локализация для \"Скрипт распределения URI (административная часть)\"",
+    "locales":[
+        {"file_in":"page_data_admin_ru.ini","file_out":"page_data_static_admin.ini"}
+    ]
+}

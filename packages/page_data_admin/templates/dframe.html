@@ -1,0 +1,16 @@
+[message]
+<h3>Добавить страницу</h3>
+<form method="POST" action="%url%">
+    <input type="hidden" name="add" value="1"/>
+    Адрес страницы:
+    <input type="text" name="add_url" placeholder="Адрес страницы" class="form-control"/>
+    <sup>Адрес обязательно должен начинаться со знака "/". Например, "/test".</sup><br/>
+    Скрипт для отображения:
+    <select name="add_script" class="form-control">
+        [scripts]
+    </select>
+    <sup>Не все скрипты могут отображать данные на странице</sup><br/>
+    <input type="submit" value="Добавить" class="form-control btn btn-success"/>
+</form>
+<h3>Удалить страницу</h3>
+[pages]
