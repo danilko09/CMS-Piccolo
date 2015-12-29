@@ -1,0 +1,8 @@
+{
+    "scripts": {
+        "piccolo_auth": {
+            "file":"piccolo_auth",
+            "actions":["login","back"]
+        }
+    }
+}
