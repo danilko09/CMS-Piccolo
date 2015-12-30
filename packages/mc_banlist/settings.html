@@ -1,3 +1,45 @@
-Код для вставки таблицы: &#60;content type="script" name="mc_banlist" action="showList"/&#62;<br/><br/>
-Пример работы:
-<content type="script" name="mc_banlist" action="showList"/>
+<h3>Основные настройки банлиста</h3>
+<form method="POST">
+    
+    [msg]
+    
+    <input type="hidden" name="banlist_settings_post" value="1"/>
+    
+    <div class="input-group">
+        <span class="input-group-addon">Название таблицы в БД</span>
+        <input type="text" name="tablename" placeholder="banlist" class="form-control" value="[dbtable]"/>
+    </div>
+<br/>
+    <div class="input-group">
+        <span class="input-group-addon">Кол-во строк в списке</span>
+        <input type="text" name="rows_count" placeholder="10" class="form-control" value="[on_page]"/>
+    </div>
+<br/>
+    <input type="submit" value="Сохранить" class="btn btn-success form-control"/>
+
+</form>
+
+<hr/>
+
+<div class="panel panel-info">
+    <div class="panel-heading" id="banlist_examples_heading">Коды для вставки <span class="glyphicon glyphicon-option-horizontal pull-right"></span></div>
+    <div class="panel-body" id="banlist_examples_body">
+        Код для вставки формы: <code>&#60;content type="script" name="mc_banlist" action="findUser"/&#62;</code><br/><br/>
+        Пример работы:
+        <div class="well">
+            <content type="script" name="mc_banlist" action="findUser"/>
+        </div><br/><br/>
+        Код для вставки таблицы: <code>&#60;content type="script" name="mc_banlist" action="showList"/&#62;</code><br/><br/>
+        Пример работы:
+        <div class="well">
+            <content type="script" name="mc_banlist" action="showList"/>
+        </div>
+    </div>
+</div>
+
+<script>
+        $('#banlist_examples_body').slideToggle();
+    $('#banlist_examples_heading').on('click',function(){
+        $('#banlist_examples_body').slideToggle();
+    });
+</script>
