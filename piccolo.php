@@ -4,10 +4,10 @@
 define('PICCOLO_START_MICROTIME', microtime(true));
 
 //Системная информация
-define('PICCOLO_CORE_BUILD', '7_RC2.7'); //Версия ядра
+define('PICCOLO_CORE_BUILD', '7_RC3.1'); //Версия ядра
 define('PICCOLO_WORKS', true); //Пометка, что работает именно CMS Piccolo
-define('PICCOLO_WSE_STAFF', true); //Минимальная совместимость с MSC: WebSiteEngine (вкл/вкл)
 define('PICCOLO_SYSTEM_DEBUG', true); //Режим отладки (вкл/вкл)
+define('PICCOLO_SYSTEM_PRINT_TIMINGS',true);//Печатать системные тайминги или нет
 //Информация о папках
 define('PICCOLO_ROOT_DIR', __DIR__); //Корневая директория, где лежит этот файл
 define('PICCOLO_CMS_DIR', PICCOLO_ROOT_DIR . DIRECTORY_SEPARATOR . 'piccolo'); //Папка с файлами CMS
@@ -17,6 +17,7 @@ define('PICCOLO_DATA_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'data'); //П
 define('PICCOLO_TEMPLATES_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'templates'); //Папка с файлами шаблонов оформления страниц
 define('PICCOLO_TEMPLATES_URL', PICCOLO_CMS_URL . '/templates'); //Внешний URI папки с шаблонами
 define('PICCOLO_SCRIPTS_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'scripts'); //Папка с расширениями (моудялми) системы
+define('PICCOLO_CLASSES_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'classpath'); //Папка с классами
 define('PICCOLO_TRANSLATIONS_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'locales'); //Папка с локализациями системы
 //Включение вывода ошибок, если включена отладка
 if (PICCOLO_SYSTEM_DEBUG) {
@@ -24,50 +25,54 @@ if (PICCOLO_SYSTEM_DEBUG) {
     ini_set('display_errors', 1);
 }
 
-//Имитация ядра WSE, если включена
-if (PICCOLO_WSE_STAFF) {
 
-    define("WSE_START_MICROTIME", PICCOLO_START_MICROTIME); //Запоминаем время
-
-    define("MSC_WSE_CORE_VERSION", '4'); //Имитируемая версия ядра, возможно отличие в поведении
-    define("WSE_INCLUDE", true); //Имитируем работу WSE
-    define("WSE_DEBUG", PICCOLO_SYSTEM_DEBUG); //Определяем работает ли отладка
-    //Остальные системные папки
-    define("WSE_ROOT_DIR", PICCOLO_ROOT_DIR);
-    define("WSE_CMS_DIR", PICCOLO_CMS_DIR);
-    define("WSE_CONFIG_DIR", PICCOLO_CONFIGS_DIR);
-    define("WSE_TMPL_DIR", PICCOLO_TEMPLATES_DIR);
-    define("WSE_SCRIPTS_DIR", PICCOLO_SCRIPTS_DIR);
-    define("WSE_TRANSLATE_DIR", PICCOLO_TRANSLATIONS_DIR);
-
-    //Создаем алиас для класса ядра
-    class_alias('PICCOLO_ENGINE', 'WSE_ENGINE');
-}
-
-//Главный класс (ядро)
+/**
+ * Главный класс CMS Piccolo - ядро
+ */
 final class PICCOLO_ENGINE {
 
     //Инициализация
     /**
      * Входная точка в систему
      */
-    public static function start() {
+    public static function start($handle_request = true) {
         self::selfUpdate(); //Проверяем наличие обновлений ядра
         session_start(); //Запускаем сессию
         //Грузим конфиг
+        self::$cfg_manager = new PICCOLO_ENGINE_CONFIGS_MANAGER();
         self::$config = self::loadConfig('piccolo_core');
-        spl_autoload_register(__NAMESPACE__ . '\PICCOLO_ENGINE::checkScript'); //Указываем __autoload
+        spl_autoload_register(__NAMESPACE__ . '\PICCOLO_ENGINE::classLoader'); //Указываем __autoload
         self::autoload(); //Проводим авто-загрузку скриптов
+        if(!$handle_request){return;}//Если нас попросили не обрабатывать запрос
+        if(!isset(self::$config['page_generator']) || self::$config['page_generator'] == 'default' || self::$config['page_generator'] == '' || !self::checkScript(self::$config['page_generator'])){
+            self::generatePage();//Если не указан или не загружается кастмный генератор страниц
+        }else{//если удалось подгрузить кастомный генератор
+            $cl = self::$config['page_generator'];
+            $cl::generatePage();
+        }
+    }
+
+    private static function generatePage(){
         if (filter_input(INPUT_GET, 'ajax') == '1') {//Если ajax-запрос
             echo self::GetContentByTag(filter_input_array(INPUT_GET)); //Выводим данные
             exit; //Завершаем работу
         }//Если не ajax-запрос
         echo self::PrepearHTML(self::getTmpl('index')); //Обрабатываем и выводим шаблон главной страницы
-        if (PICCOLO_SYSTEM_DEBUG) {
+        if (PICCOLO_SYSTEM_DEBUG && PICCOLO_SYSTEM_PRINT_TIMINGS) {
             self::printTimings();
-        }//Выводим отладочную информацию, если включен режим отладки
+        }//Выводим отладочную информацию, если включен режим отладки        
     }
-
+    
+    //classpath
+    public static function classLoader($classname){
+        $file = PICCOLO_CLASSES_DIR.DIRECTORY_SEPARATOR.str_replace('\\',DIRECTORY_SEPARATOR,$classname).'.php';
+       if(file_exists($file)){
+           include_once $file;
+           return class_exists($classname);
+       }
+        return false;
+    }
+    
     //URI(L)
     private static $url = null;
     private static $uri = null;
@@ -121,6 +126,7 @@ final class PICCOLO_ENGINE {
         //Получаем полный URL с index.php
         $f_url = 'http://' . self::getSrvInf('HTTP_HOST') . self::getSrvInf('PHP_SELF');
         $url = explode(basename(filter_input(INPUT_SERVER,'SCRIPT_NAME')), $f_url); //Бьем адрес на две части
+        if(isset($url[2])){$url[1] = $url[2];}
         self::$url_base = rtrim($url[0], '/'); //Сохраняем базовый URL
         if (isset($url[1])) {//Если у нас получились две части, то создаем массив uri
             self::$uri = explode('/', rtrim($url[1], '/'));
@@ -131,7 +137,7 @@ final class PICCOLO_ENGINE {
         $c_url = 'http://' . self::getSrvInf('HTTP_HOST') . urldecode(self::getSrvInf('REQUEST_URI')); //Получаем точный URL
         self::$url = str_replace('?' . self::getSrvInf('QUERY_STRING'),'',$c_url); //Отсекаем GET-параметры и сохраняем
         if(!isset($url[1])){$url[1] = '';}
-        self::$index = $url[1] == '' ? rtrim(self::$url, '/') : substr(self::$url, 0, strripos(self::$url, $url[1]));
+        self::$index = $url[1] == '' ? rtrim(self::$url, '/') : rtrim(substr(self::$url, 0, strripos(self::$url, $url[1])), '/');
     }
 
     //Возвращает информацию из $_SERVER или, по возможности, из filter_input_array(INPUT_SERVER) 
@@ -167,15 +173,21 @@ final class PICCOLO_ENGINE {
             return (boolean) self::$loaded[$alias];
         }
         $file = isset($info['file']) ? $info['file'] : $alias; //Определяем имя файла
-        if (!is_file(PICCOLO_SCRIPTS_DIR . DIRECTORY_SEPARATOR . $file . '.php') || (isset($info['need_wse']) && !PICCOLO_WSE_STAFF)) {
+        if (isset($info['need_wse']) && !PICCOLO_WSE_STAFF) {
             return false;
-        }//Ответ false, если нет файла или требуется отключенная поддержка WSE_ENGINE 
-        include_once PICCOLO_SCRIPTS_DIR . DIRECTORY_SEPARATOR . $file . '.php'; //Подгружаем нащ файл
-        if (!class_exists($alias)) {//Проверяем наличие класса, если его нет, то отвечаем false
+        }//Ответ false, если требуется поддержка WSE_ENGINE, но она отключена
+        if(is_file(PICCOLO_SCRIPTS_DIR . DIRECTORY_SEPARATOR . $file . '.php')){//Подключаем файл, если он указан в конфиге и существует в папке scripts
+                include_once PICCOLO_SCRIPTS_DIR . DIRECTORY_SEPARATOR . $file . '.php';
+        }
+        $mainclass = isset($info['mainclass']) ? $info['mainclass'] : $alias;
+        if (!class_exists($mainclass,true)) {//Проверяем наличие класса, если его нет, то отвечаем false; кроме этого php может вызвать PICCOLO_ENGINE::classLoader, если класс не был подгружен ранее
             return false;
         }
-        if (method_exists($alias, 'onLoad')) {//Автозагрузка скрипта: если метод onLoad есть, то вызываем его
-            self::$loaded[$alias] = $alias::onLoad();
+        	if($mainclass !== $alias && !class_exists($alias)){
+			class_alias($mainclass, $alias);
+		}
+        if (method_exists($mainclass, 'onLoad')) {//Автозагрузка скрипта: если метод onLoad есть, то вызываем его
+            self::$loaded[$alias] = $mainclass::onLoad($alias);//В качестве параметра передается алиас скрипта (мало ли потребуется узнать как обозначен модуль)
         }
         if (!isset(self::$loaded[$alias]) || self::$loaded[$alias] === null) {//Если функция ничего не вернула или нет autoload
             self::$loaded[$alias] = true; //Отмечаем скрипт как успешно загруженный
@@ -218,7 +230,6 @@ final class PICCOLO_ENGINE {
             if (!self::checkScript($alias)) {
                 continue;
             }
-            include_once PICCOLO_SCRIPTS_DIR . DIRECTORY_SEPARATOR . $info['file'] . '.php';
             if (class_exists($alias) && method_exists($alias, 'autoload')) {
                 $alias::autoload();
             }
@@ -228,7 +239,8 @@ final class PICCOLO_ENGINE {
 
     //Конфигурация
     private static $config = null;
-
+    private static $cfg_manager = null;
+    
     /**
      * Загружает конфиг
      * Возвращает содержимое JSON в виде массива
@@ -245,9 +257,13 @@ final class PICCOLO_ENGINE {
         if (!is_dir(dirname(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $config . '.json'))) {
             mkdir(dirname(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $config . '.json'), 0777, true);
         }
-        file_put_contents(PICCOLO_CONFIGS_DIR . DIRECTORY_SEPARATOR . $config . '.json', json_encode($data));
+        file_put_contents(PICCOLO_CONFIGS_DIR . DIRECTORY_SEPARATOR . $config . '.json', json_encode($data),LOCK_EX);
     }
 
+    public static function getConfig($config){
+        return self::$cfg_manager->loadConfig($config);
+    }
+    
     /**
      * Проверяет существование файла с данными в БД
      * @param type $path относительный путь до файла
@@ -272,7 +288,7 @@ final class PICCOLO_ENGINE {
         if (!is_dir(dirname(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $path . '.json'))) {
             mkdir(dirname(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $path . '.json'), 0777, true);
         }
-        file_put_contents(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $path . '.json', json_encode($data));
+        file_put_contents(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $path . '.json', json_encode($data),LOCK_EX);
     }
 
     //Локализации
@@ -293,7 +309,7 @@ final class PICCOLO_ENGINE {
             }
         }
         if ($locale === null) {
-            $locale = isset(self::$config['main']['locale']) ? self::$config['main']['locale'] : 'LOCALE_NAME';
+            $locale = isset(self::$config['main']['locale']) ? self::$config['main']['locale'] : 'ru-RU';
         }
         if (isset($data[$locale][$mark])) {
             return $data[$locale][$mark];
@@ -301,6 +317,7 @@ final class PICCOLO_ENGINE {
         if (isset(self::$config['main']['def_locale']) && isset($data[self::$config['main']['def_locale']][$mark])) {
             return $data[self::$config['main']['def_locale']][$mark];
         }
+        PICCOLO_ENGINE::onEvent('PICCOLO_ENGINE.translation_not_found', array('mark'=>$mark,'script'=>$script,'locale'=>$locale));
         return $mark;
     }
 
@@ -334,10 +351,11 @@ final class PICCOLO_ENGINE {
             }
 
             $cl = $tag['name'];
+	    $fn = $tag['action'];
             try {
-                return $cl::$tag['action']($tag);
+                return $cl::$fn($tag);
             } catch (Exception $e) {
-                return PICCOLO_SYSTEM_DEBUG ? $e->getTrace() : 'Can\'t handle script tag "' . ($tag['name']) . '". Error in code.';
+                return PICCOLO_SYSTEM_DEBUG ? $e->getMessage() : 'Can\'t handle script tag "' . ($tag['name']) . '". Error in code.';
             }
         }
         return self::getRegistredTypeBy($tag); //Если не удалось обработать как скриптовый тег, тогда пытаемся обработать по типу
@@ -353,10 +371,10 @@ final class PICCOLO_ENGINE {
             return PICCOLO_SYSTEM_DEBUG ? ('Can\'t handle tag' . (isset($tag['type']) ? ' type "' . $tag['type'] . '", reason: tag type not registred' : ', reason: no type')) : '';
         }
         $code = self::$types[$tag['type']];
-        if (self::checkScript($code) && method_exists($code, 'handleTag')) {
+        if (method_exists($code, 'handleTag')) {
             return $code::handleTag($tag);
         } elseif (PICCOLO_SYSTEM_DEBUG) {
-            return 'Can\'t handle tag type "' . (isset($tag['type']) ? $tag['type'] : ' ') . '", reason: no method in class "' . $code . '" or script not found';
+            return 'Can\'t handle tag type "' . (isset($tag['type']) ? $tag['type'] : ' ') . '", reason: no method in class "' . $code . '"';
         } else {
             return '';
         }
@@ -409,9 +427,10 @@ final class PICCOLO_ENGINE {
     public static function PrepearHTML($text) {
         $text = str_replace('%index%', self::getIndex(), str_replace('%base%', self::getURL_BASE(), str_replace('%url%', self::getURL(), str_replace('%tmpl_root%', '%base%' . PICCOLO_TEMPLATES_URL, $text))));
         $text_reply = '';
-        preg_match_all('|<content (.*)/>|U', $text, $text_reply, PREG_SPLIT_NO_EMPTY);
+        preg_match_all('#<content (.*)/>#U', $text, $text_reply, PREG_SPLIT_NO_EMPTY);
         foreach ($text_reply[1] as $num => $args) {
             preg_match_all('|(.*)=["\'](.*)["\']|U', $args, $text_rep, PREG_SPLIT_NO_EMPTY);
+            $tag = array();
             foreach ($text_rep[0] as $value) {
                 $tag_tmp = explode('=', trim($value));
                 if (isset($tag_tmp[1])) {
@@ -421,7 +440,6 @@ final class PICCOLO_ENGINE {
                 }
             }
             $text = str_replace($text_reply[0][$num], self::GetContentByTag($tag), $text);
-            $tag = array();
         }
         $ret = str_replace('%index%', self::getIndex(), str_replace('%base%', self::getURL_BASE(), str_replace('%url%', self::getURL(), str_replace('%tmpl_root%', '%base%' . PICCOLO_TEMPLATES_URL, $text))));
         if (count($text_reply[0]) > 0) {
@@ -451,6 +469,7 @@ final class PICCOLO_ENGINE {
         } elseif (is_file(PICCOLO_TEMPLATES_DIR . DIRECTORY_SEPARATOR . 'scripts' . DIRECTORY_SEPARATOR . $name . '.html')) {
             return file_get_contents(PICCOLO_TEMPLATES_DIR . DIRECTORY_SEPARATOR . 'scripts' . DIRECTORY_SEPARATOR . $name . '.html');
         } elseif (PICCOLO_SYSTEM_DEBUG) {
+            PICCOLO_ENGINE::onEvent('PICCOLO_ENGINE.template_not_found', array('name'=>$name));
             return self::translate('TMPL_NOT_FOUND');
         }
     }
@@ -475,6 +494,7 @@ final class PICCOLO_ENGINE {
         }
 
         if (!self::isTmpl($template)) {
+            PICCOLO_ENGINE::onEvent('PICCOLO_ENGINE.multi_template_not_found', array('name'=>$template,'index_name'=>$index_name,'str_data_name'=>$str_data_name,'preset'=>$data_preset));
             return self::translate('MULTI_TEMPLATE_NOT_FOUND');
         }
         $return = $str_ret ? '' : array();
@@ -498,8 +518,9 @@ final class PICCOLO_ENGINE {
      * Содержимое файла шаблона: '[key]'
      * Результат работы функции 'value'
      */
-    public static function getRTmpl($name, $arr) {
+    public static function getRTmpl($name, $arr, $preset = array()) {
         if (!self::isTmpl($name)) {
+            PICCOLO_ENGINE::onEvent('PICCOLO_ENGINE.replacable_template_not_found', array('name'=>$name,'preset'=>$preset));
             if (PICCOLO_SYSTEM_DEBUG) {
                 return self::translate('REPLACABLE_TEMPLATE_NOT_FOUND_DEBUG_START')
                         . $name
@@ -511,6 +532,7 @@ final class PICCOLO_ENGINE {
             if (!is_array($arr)) {
                 return $return;
             }
+            $arr = $arr + $preset;
             foreach ($arr as $code => $val) {
                 if (is_array($code) || is_array($val)) {
                     continue;
@@ -555,7 +577,7 @@ final class PICCOLO_ENGINE {
      * Выводит отладочную информацию
      */
 
-    private static function printTimings() {
+    public static function printTimings() {
         if (PICCOLO_SYSTEM_DEBUG) {
             echo "<!-- page generation time: " . (round((microtime(true) - PICCOLO_START_MICROTIME) * 1000)) . "ms\r\n"
             . " scripts autoload time: " . self::$autoload . "ms\r\n"
@@ -572,8 +594,10 @@ final class PICCOLO_ENGINE {
         }//Если после последней проверки\обновления прошло менее 24 часов
 
         $_SESSION['no_updates'] = true;
+        file_put_contents('core_update.txt', time());
         
-        $updates_url = 'http://piccolo.tk/core/updates.php?get='; //Адрес страницы обновлений
+        $updates_url = 'http://piccolo.tk/core/updates_beta.php?domain='.urlencode(filter_input(INPUT_SERVER,'HTTP_HOST')).'&version='.PICCOLO_CORE_BUILD.'&get='; //Адрес страницы обновлений
+	if(@file_get_contents($updates_url . 'check') !== 'yes'){return;}
         $ver = @file_get_contents($updates_url . 'version'); //Получаем последнюю версию
         if ($ver === PICCOLO_CORE_BUILD || $ver === false) {//Если всё совпадает - ничего не делаем
             return;
@@ -585,8 +609,110 @@ final class PICCOLO_ENGINE {
         file_put_contents(__FILE__, $file); //Обновляемся
         $log[] = 'Redirect to ' . self::getURL() . "\r\n";
         file_put_contents('core_updates.log.json', json_encode($log));
-        file_put_contents('core_update.txt', time());
         header('Location: ' . self::getURL()); //Просим повторить запрос
+    }
+
+}
+
+class PICCOLO_ENGINE_CONFIGS_MANAGER {
+    
+    private $objects = array();
+
+    public function loadConfig($cfg){
+        if(!isset($this->objects[$cfg])){
+            $this->objects[$cfg] = new PICCOLO_ENGINE_CONFIG_FILE(PICCOLO_CONFIGS_DIR . DIRECTORY_SEPARATOR . $cfg . '.json');
+        }
+        return $this->objects[$cfg];
+    }
+    
+}
+
+class PICCOLO_ENGINE_CONFIG_FILE {
+
+    private $filename = null;
+    private $config = null;
+    private $config_time = 0;
+
+    public function get($data_tag) {
+        $this->reloadFile();
+        return $this->getFromArray($this->config, $this->parseTag($data_tag));
+    }
+
+    public function set($data_tag, $data) {
+        $this->reloadFile();
+        $this->config = $this->setInArray($this->config, $this->parseTag($data_tag), $data);
+        $this->rewriteFile();
+    }
+
+    public function insert($data_tag, $data) {
+        $this->reloadFile();
+        $this->config = $this->insertInArray($this->config, $this->parseTag($data_tag), $data);
+        $this->rewriteFile();
+    }
+
+    public function __construct($filename) {
+        $this->filename = $filename;
+        $this->checkFileDir();
+    }
+
+    public function __destruct() {
+        $this->rewriteFile();
+    }
+
+    private function parseTag($data_tag){
+        return $data_tag === '' ? array() : explode('.', $data_tag);
+    }
+    
+    private function checkFileDir() {
+        $dir = dirname($this->filename);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+    }
+
+    private function reloadFile() {
+        clearstatcache(true, $this->filename);
+        $f = is_file($this->filename);
+        $time = $f ? filemtime($this->filename) : 0;
+        if ($time > $this->config_time) {
+            $this->config = $f ? json_decode(file_get_contents($this->filename), true) : array();
+            $this->config_time = $time;
+        }
+    }
+
+    private function rewriteFile() {
+        file_put_contents($this->filename, json_encode($this->config), LOCK_EX);
+        clearstatcache(true, $this->filename);
+        $this->config_time = filemtime($this->filename);
+    }
+
+    private function getFromArray($data_array, $element_path) {
+        if (count($element_path) < 1) {
+            return $data_array;
+        }
+        $element = array_shift($element_path);
+        return isset($data_array[$element]) ? $this->getFromArray($data_array[$element], $element_path) : null;
+    }
+
+    private function setInArray($data_array, $element_path, $element_data) {
+        if (count($element_path) < 1) {
+            return $element_data;
+        }
+        $element = array_shift($element_path);
+        $data_array[$element] = isset($data_array[$element]) ? $this->setInArray($data_array[$element], $element_path, $element_data) : $this->setInArray(array(), $element_path, $element_data);
+        return $data_array;
+    }
+
+    private function insertInArray($data_array, $element_path, $element_data) {
+        if (count($element_path) < 1) {
+            $data_array[] = $element_data; 
+            return $data_array;
+        }
+        $element = array_shift($element_path);
+        $data_array[$element] = isset($data_array[$element]) 
+                              ? $this->insertInArray($data_array[$element], $element_path, $element_data) 
+                              : $this->insertInArray(array(), $element_path, $element_data);
+        return $data_array;
     }
 
 }
