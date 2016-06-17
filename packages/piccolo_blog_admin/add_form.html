@@ -1,0 +1,14 @@
+<form method="POST">
+    [msg]
+    <input type="hidden" name="piccolo_blog_add_secret" value="1"/>
+    Название новости:<br/>
+    <input type="text" name="title"/><br/>
+    Автор:<br/>
+    <input type="text" name="author"/><br/>
+    Краткая новость:<br/>
+    <textarea name="content"></textarea><br/>
+    Полная новость:<br/>
+    <textarea name="content_full"></textarea><br/>
+    <i>Если в поле "полная новость" ничего не введено, то оно автоматически заполняется содержимым поля "краткая новость".</i><br/>
+    <input type="submit" value="Опубликовать"/>
+</form>

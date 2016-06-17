@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "piccolo_blog_admin": {
+            "file": "piccolo_blog_admin",
+            "admin_category":"news",
+            "admin_title":"Добавить новость"
+        }
+    }
+}

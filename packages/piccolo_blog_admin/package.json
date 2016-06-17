@@ -1,0 +1,25 @@
+{
+    "title":"Блоговый движок CMS Piccolo (административная часть)",
+    "requires":["piccolo_blog"],
+    "configs":[
+        {
+            "file_in": "piccolo_core.json",
+            "file_out": "piccolo_core.json",
+            "mode": "merge"
+        }
+    ],
+    "scripts":[
+        {
+            "file_in":"piccolo_blog_admin.php",
+            "file_out":"piccolo_blog_admin.php",
+            "mode":"replace"
+        }
+    ],
+    "templates":[
+        {
+            "file_in":"add_form.html",
+            "file_out":"scripts/piccolo_blog_admin/add_form.html",
+            "mode":"new"
+        }
+    ]
+}
