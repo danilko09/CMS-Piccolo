@@ -4,7 +4,7 @@
 define('PICCOLO_START_MICROTIME', microtime(true));
 
 //Системная информация
-define('PICCOLO_CORE_BUILD', '7_RC3.1'); //Версия ядра
+define('PICCOLO_CORE_BUILD', '7_RC3.2'); //Версия ядра
 define('PICCOLO_WORKS', true); //Пометка, что работает именно CMS Piccolo
 define('PICCOLO_SYSTEM_DEBUG', true); //Режим отладки (вкл/вкл)
 define('PICCOLO_SYSTEM_PRINT_TIMINGS',true);//Печатать системные тайминги или нет
@@ -254,8 +254,8 @@ final class PICCOLO_ENGINE {
      * Полностью перезаписывает содержимое JSON содержимым в переданном массиве (Если что-то отсутствует в массиве, то оно будет удалено из конфига)
      */
     public static function updateConfig($config, $data) {
-        if (!is_dir(dirname(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $config . '.json'))) {
-            mkdir(dirname(PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . $config . '.json'), 0777, true);
+	if (!is_dir(dirname(PICCOLO_CONFIGS_DIR . DIRECTORY_SEPARATOR . $config . '.json'))) {
+            mkdir(dirname(PICCOLO_CONFIGS_DIR . DIRECTORY_SEPARATOR . $config . '.json'), 0777, true);
         }
         file_put_contents(PICCOLO_CONFIGS_DIR . DIRECTORY_SEPARATOR . $config . '.json', json_encode($data),LOCK_EX);
     }
