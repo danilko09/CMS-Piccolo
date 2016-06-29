@@ -1,0 +1,29 @@
+<form method="POST">
+    <h3>Добавить сервер</h3>
+    <input type="hidden" name="rcon_add_server_posted" value="1"/>
+    <div class="input-group">
+	<span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+	<input type="text" name="title" class="form-control" placeholder="Название профиля"/>
+    </div><br/>
+    <div class="input-group">
+	<span class="input-group-addon"><span class="glyphicon glyphicon-globe"></span></span>
+	<input type="text" name="address" class="form-control" placeholder="IP адрес"/>
+    </div><br/>
+    <div class="input-group">
+	<span class="input-group-addon"><span class="glyphicon glyphicon-transfer"></span></span>
+	<input type="text" name="port" class="form-control" placeholder="Порт RCON"/>
+    </div><br/>
+    <div class="input-group">
+	<span class="input-group-addon"><span class="glyphicon glyphicon-certificate"></span></span>
+	<input type="password" name="password" class="form-control" placeholder="Пароль RCON"/>
+    </div><br/>
+    <input type="submit" value="Добавить" class="form-control btn btn-success"/>
+</form>
+<br/>
+<div class="alert alert-info">После изменения списка серверов, рекомендуется повторно настроить скрипты, которые используют RCON для синхронизации с сервером.(Например, магазин)</div><br/>
+<table class="table">
+    <thead><th>#</th><th>Название</th><th>Адрес</th><th>Действия</th></thead>
+    <tbody>
+	[servers]
+    </tbody>
+</table>

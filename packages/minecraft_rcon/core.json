@@ -1,0 +1,9 @@
+{
+    "scripts":{
+	"minecraft_rcon":{
+	    "mainclass":"danilko09\\minecraft\\rcon",
+	    "admin_category":"minecraft",
+	    "admin_title":"RCON"
+	}
+    }
+}
