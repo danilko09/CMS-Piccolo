@@ -1,0 +1,15 @@
+{
+    "title":"Централизованная авторизация Piccolo (beta)",
+    "scripts": [
+        {"file_in":"piccolo_auth.php","file_out":"piccolo_auth.php","mode":"replace"}
+    ],
+    "configs": [
+        {"file_in":"piccolo_core.json","file_out":"piccolo_core.json","mode":"merge"}
+    ],
+    "templates":[
+        {"file_in":"form.html","file_out":"piccolo_auth/form.html","mode":"replace"}
+    ],
+    "locales":[
+        {"file_in":"locale_ru-RU.ini","file_out":"piccolo_auth.ini", "mode":"merge"}
+    ]
+}
