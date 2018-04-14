@@ -1,0 +1,10 @@
+{
+    "scripts":{
+        "mc_banlist":{
+            "file":"mc_banlist",
+            "admin_category":"minecraft",
+            "admin_title":"Банлист",
+            "actions":["showList","showLines","findUser","findUserAjax"]
+        }
+    }
+}

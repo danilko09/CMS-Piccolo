@@ -1,0 +1,21 @@
+{
+    
+    "requires":["piccolo_pdo"],
+    "title":"Список заблокированных (minecraft)",
+    
+    "configs":[
+        {"file_in":"core.json","file_out":"piccolo_core.json","mode":"merge"}
+    ],
+    
+    "scripts":[
+        {"file_in":"banlist.php","file_out":"mc_banlist.php","mode":"replace"}
+    ],
+    
+    "templates":[
+        {"file_in":"table.html","file_out":"scripts/mc_banlist/table.html","mode":"replace"},
+        {"file_in":"table_line.html","file_out":"scripts/mc_banlist/table_line.html","mode":"replace"},
+        {"file_in":"finduser.html","file_out":"scripts/mc_banlist/finduser.html","mode":"replace"},
+        {"file_in":"settings.html","file_out":"scripts/mc_banlist/settings.html","mode":"replace"}
+    ]
+    
+}

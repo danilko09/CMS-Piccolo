@@ -1,0 +1,17 @@
+{
+    "classes":[
+	{"file_in":"api/mcraftrcon.class.php","file_out":"xPaw/MinecraftRcon.php","mode":"new"},
+	{"file_in":"api/connector.php","file_out":"danilko09/minecraft/rcon/connector.php","mode":"replace"},
+	{"file_in":"rcon.php","file_out":"danilko09/minecraft/rcon.php","mode":"replace"}
+    ],
+    "configs":[
+	{"file_in":"core.json","file_out":"piccolo_core.json","mode":"merge"}
+    ],
+    "templates":[
+	{"file_in":"setup.html","file_out":"scripts/minecraft/rcon/setup.html","mode":"replace"},
+	{"file_in":"setup_list.html","file_out":"scripts/minecraft/rcon/setup_list.html","mode":"replace"}
+    ],
+    "locales":[
+	{"file_in":"locale.ini","file_out":"minecraft_rcon.ini"}
+    ]
+}

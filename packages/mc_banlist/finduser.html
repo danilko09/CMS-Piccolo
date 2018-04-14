@@ -1,0 +1,12 @@
+<h3>Проверить логин</h3>
+<div class="input-group">
+    <span class="input-group-addon">Логин</span>
+    <input type="text" id="banlist_checkuser_inp" class="form-control"/>
+    <span class="input-group-btn"><button id="banlist_checkuser_btn" class="btn btn-success">Проверить</button></span>
+</div>
+<div id="banlist_checkuser_res"></div>
+<script>
+    $('#banlist_checkuser_btn').on('click',function (){
+        $('#banlist_checkuser_res').load('%index%?ajax=1&type=script&name=mc_banlist&action=findUserAjax&username='+encodeURIComponent($('#banlist_checkuser_inp').val()));
+    });
+</script>
