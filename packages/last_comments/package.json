@@ -1,0 +1,13 @@
+{
+    "title":"Информер \"последние комментарии\"",
+    "scripts":[
+        {"file_in":"last_comments.php","file_out":"last_comments.php","mode":"replace"}
+    ],
+    "configs":[
+        {"file_in":"piccolo_core.json","file_out":"piccolo_core.json","mode":"merge"}
+    ],
+    "templates":[
+        {"file_in":"templates/comments_frame.html","file_out":"scripts/last_comments/comments_frame.html","mode":"replace"},
+        {"file_in":"templates/comment.html","file_out":"scripts/last_comments/comment.html","mode":"replace"}
+    ]
+}
