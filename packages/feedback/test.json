@@ -1,8 +1,7 @@
 {
-    "title":"Кмпонент \"Обратная связь\"",
-    "requires":["piccolo_admin"],
+    "title":"Обратная связь",
     "scripts":[
-        {"file_in":"feedback.php","file_out":"feedback.php","mode":"replace"}
+        {"file_in":"feedback_test.php","file_out":"feedback.php","mode":"replace"}
     ],
     "templates":[
         {"file_in":"tmpl/form.html","file_out":"scripts/feedback/form.html","mode":"replace"},

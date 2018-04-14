@@ -1,0 +1,27 @@
+<h3>Обратная связь <small>параметры компонента</small></h3>
+<h4>Заголовок страницы</h4>
+[title_msg]
+<form action="%url%" method="POST">
+    <input type="hidden" name="feedback_settings_title" value="1"/>
+    <div class="input-group">
+        <input type="text" class="form-control" name="title" value="[title]" placeholder="Заголовок"/>
+        <span class="input-group-btn">
+            <input type="submit" class="btn btn-success" value="применить"/>
+        </span>
+    </div>
+</form>
+<h4>Добавить обязательное поле</h4>
+[add_msg]
+<form action="%url%" method="POST">
+    <input type="hidden" name="feedback_settings_list-add" value="1"/>
+    <input type="text" name="add_name" placeholder="Значение аттрибута name" class="form-control"/><br/>
+    <input type="text" name="add_title" placeholder="Название поля" class="form-control"/><br/>
+    <input type="submit" class="form-control btn btn-success" value="Добавить"/>
+</form>
+<h4>Обязательные поля</h4>
+<table class="table table-striped">
+    <thead><th>name</th><th>название</th><th>действия</th></thead>
+<tbody>
+    [fields]
+</tbody>
+</table>

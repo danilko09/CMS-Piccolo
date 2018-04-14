@@ -104,6 +104,8 @@
 			
 			$pages_count = ceil($messages_count/$on_page);
 		
+                        var_dump($p);
+                        
 			$page = (count($p) >= 1) && (intval($p[0]) <= $pages_count) ? $p[0] : 1;
 			
 			//Выборка сообщений
