@@ -48,7 +48,13 @@ class piccolo_blog{
         foreach(self::$base['posts'] as $id => $post){
             if(isset(self::$base['onpage']) && self::$base['onpage'] < $c){break;}
             $c++;
-            $posts = PICCOLO_ENGINE::getRTmpl('piccolo_blog/blog_post', $post + array('id'=>$id)).$posts;
+			$date = '';
+			if(isset($post['date'])){
+				$date = date('d.m.Y H:i');
+			}else{
+				$date = PICCOLO_ENGINE::translate('NO_DATE','piccolo_blog');
+			}
+            $posts = PICCOLO_ENGINE::getRTmpl('piccolo_blog/blog_post', array('date'=>$date)+$post + array('id'=>$id)).$posts;
         }
         
         return $posts;
@@ -64,7 +70,15 @@ class piccolo_blog{
         if(PICCOLO_ENGINE::checkScript('breadcrumbs')){
             breadcrumbs::setTitle('/' . rtrim(implode('/', $uri), '/'),$post['title']);
         }
-        return PICCOLO_ENGINE::getRTmpl('piccolo_blog/post_page', $post);
+		
+		$date = '';
+		if(isset($post['date'])){
+			$date = date('d.m.Y H:i');
+		}else{
+			$date = PICCOLO_ENGINE::translate('NO_DATE','piccolo_blog');
+		}
+		
+        return PICCOLO_ENGINE::getRTmpl('piccolo_blog/post_page', array('date'=>$date)+$post + array('id'=>$id));
     }
     
 }
