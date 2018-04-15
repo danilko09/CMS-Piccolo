@@ -12,7 +12,7 @@
                 
                 if($msg === ''){
                     $blog_db = PICCOLO_ENGINE::loadConfig('piccolo_blog');
-                    $blog_db['posts'][] = filter_input_array(INPUT_POST);
+                    $blog_db['posts'][] = filter_input_array(INPUT_POST) + ['date'=>time()];
                     PICCOLO_ENGINE::updateConfig('piccolo_blog',$blog_db);
                     $msg = PICCOLO_ENGINE::translate('SUCCESS','piccolo_blog_admin');
                 }
