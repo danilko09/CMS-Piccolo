@@ -1,0 +1,7 @@
+{
+    "scripts":{
+        "users_base":{
+            "file":"users_base"
+        }
+    }
+}

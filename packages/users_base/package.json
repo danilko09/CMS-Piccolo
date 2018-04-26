@@ -1,0 +1,11 @@
+{
+    "title":"База данных пользователей",
+    "scripts":[
+        {"file_in":"script.php","file_out":"users_base.php","mode":"replace"}
+    ],
+    "configs":[
+        {"file_in":"deny.htaccess","file_out":".htaccess","mode":"new"},
+        {"file_in":"config.json","file_out":"users_base.json","mode":"new"},
+        {"file_in":"core.json","file_out":"piccolo_core.json","mode":"merge"}
+    ]
+}
