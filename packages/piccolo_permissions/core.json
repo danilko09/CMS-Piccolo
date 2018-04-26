@@ -1,0 +1,7 @@
+{
+    "scripts":{
+        "users_permissions":{
+            "file":"piccolo_permissions"
+        }
+    }
+}

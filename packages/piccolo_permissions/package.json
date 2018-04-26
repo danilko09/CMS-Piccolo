@@ -1,0 +1,13 @@
+{
+    "title":"Менеджер прав доступа",
+    "category":"users",
+    "description":"Пакет, который используется для управления правами пользователей. В состав входит только API для модулей, административный интерфейс не предоставляется.",
+    "requires":["users_base"],
+    "configs":[
+        {"file_in":"core.json","file_out":"piccolo_core.json","mode":"merge"}
+    ],
+    "scripts":[
+        {"file_in":"perms.php","file_out":"piccolo_permissions.php","mode":"replace"}
+    ]
+    
+}
