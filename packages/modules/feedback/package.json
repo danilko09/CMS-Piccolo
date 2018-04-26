@@ -1,6 +1,6 @@
 {
     "title":"Кмпонент \"Обратная связь\"",
-    "requires":["piccolo_admin"],
+    "requires":["modules/piccolo_admin"],
     "scripts":[
         {"file_in":"feedback.php","file_out":"feedback.php","mode":"replace"}
     ],

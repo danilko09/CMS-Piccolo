@@ -1,6 +1,6 @@
 {
     "title":"Блоговый движок CMS Piccolo",
-    "requires":["page_data", "piccolo_blog/locale_ru-RU", "piccolo_blog/admin"],
+    "requires":["page_data", "modules/piccolo_blog/locale_ru-RU", "modules/piccolo_blog/admin"],
     "configs":[
         {"file_in":"config/piccolo_core.json","file_out":"piccolo_core.json"},
         {"file_in":"config/pages_data.json","file_out":"page_data.json"},

@@ -1,6 +1,6 @@
 {
     "title": "Компонент \"Google ReCaptcha 2\"",
-    "requires": ["piccolo_admin"],
+    "requires": ["modules/piccolo_admin"],
     "configs": [{
             "file_in": "piccolo_core.json",
             "file_out": "piccolo_core.json",

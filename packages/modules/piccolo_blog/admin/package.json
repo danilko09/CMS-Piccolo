@@ -2,7 +2,7 @@
     "title":"Административная часть компонента \"Блог\"",
     "category":"admin",
     "description":"Интерфейс администратора для пакета piccolo_blog. Возможно только добавление новостей, поля формы: название, автор, краткая новость, полная новость.",
-    "requires":["piccolo_blog", "piccolo_blog/admin_locale_ru-RU"],
+    "requires":["modules/piccolo_blog", "modules/piccolo_blog/admin_locale_ru-RU"],
     "configs":[
         {
             "file_in": "piccolo_core.json",

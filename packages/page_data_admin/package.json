@@ -1,6 +1,6 @@
 {
     "title":"Редактор статических и динамических страниц",
-    "requires":["piccolo_admin","page_data","page_data_admin_locale_ru-RU"],
+    "requires":["modules/piccolo_admin","page_data","page_data_admin/locale_ru-RU"],
     "scripts": [
         {
             "file_in": "page_data_static_admin.php",

@@ -1,6 +1,6 @@
 {
     "title":"Компонент \"Регистрация\"",
-    "requires":["users_base"],
+    "requires":["users/users_base"],
     "templates":[
         {"file_in":"form.html","file_out":"registration.html","mode":"new"}
     ],

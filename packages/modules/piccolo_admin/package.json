@@ -1,6 +1,6 @@
 {
     "title":"Административная панель CMS Piccolo",
-    "requires":["page_data","users_base","min_auth","piccolo_permissions"],
+    "requires":["page_data","users/users_base","users/min_auth","users/piccolo_permissions"],
     "configs":[
         {"file_in":"configs/core.json","file_out":"piccolo_core.json","mode":"merge"},
         {"file_in":"configs/config.json","file_out":"piccolo_admin.json","mode":"new"},
