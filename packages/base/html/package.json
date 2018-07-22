@@ -1,0 +1,16 @@
+{
+    "title":"customHTML",
+    "category":"dev",
+    "description":"Пакет для динамической вставки HTML-кода в шаблон",
+    "links":{
+	"http://piccolo.tk/documentation/customHTML.html":"Документация для разработчиков"
+    },
+    "classes":[
+	{"file_int":"customHTML","file_out":"danilko09\\customHTML\\customHTML"},
+	{"file_int":"customCSS","file_out":"danilko09\\customHTML\\customCSS"}
+    ],
+    "configs":[
+	{"file_in":"piccolo_core.json","file_out":"piccolo_core.json","mode":"merge"}
+    ]
+    
+}

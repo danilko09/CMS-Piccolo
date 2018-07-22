@@ -1,0 +1,8 @@
+{
+    "scripts":{
+	"customHTML":{
+	    "mainclass":"danilko09\\customHTML\\customHTML",	    
+	    "autoload":"1"
+	}
+    }
+}
