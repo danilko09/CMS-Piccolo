@@ -1,0 +1,10 @@
+{
+    "title": "Контроль версий",
+    "description": "Используется пакетом base/packages/installer для контроля установленных версий",
+    "category": "base",
+    "version": "1.0-dev",
+    
+    "classes": [
+        {"file_in":"VersionControl.php", "file_out":"danilko09/packages/VersionControl.php"}
+    ]        
+}

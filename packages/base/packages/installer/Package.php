@@ -6,6 +6,7 @@ class Package {
 
     private $info;
     private $requires;
+    private $version;
     private $beforeInstall;
     private $rootFiles;
     private $configs;
@@ -19,6 +20,7 @@ class Package {
         $this->info = $info;
 
         $this->requires = $info['requires'] ?? [];
+        $this->version = $info['version'] ?? "";
         $this->beforeInstall = $info['before_install'] ?? null;
         $this->rootFiles = $info['root'] ?? [];
         $this->configs = $info['configs'] ?? [];
@@ -31,6 +33,10 @@ class Package {
 
     public function getRequires() {
         return $this->requires;
+    }
+
+    public function getVersion() {
+        return $this->version;
     }
 
     public function getDependenciesList() {

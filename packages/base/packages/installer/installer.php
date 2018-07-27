@@ -45,6 +45,13 @@ final class Installer {
 
         self::installDependencies($repoPath, $packageInfo, $toInstall);
 
+        if(class_exists("danilko09\\packages\\VersionControl")){
+            if(!danilko09\packages\VersionControl::isCurrentLower($package, $packageInfo->getVersion()) &&
+                    !danilko09\packages\VersionControl::isVersionUndefined($package)){
+                return;
+            }
+        }
+        
         self::runScript($packagePath, $packageInfo->getBeforeInstall());
         self::deployRootFiles($packagePath, $packageInfo);
         self::updateConfigs($packagePath, $packageInfo);
@@ -53,6 +60,10 @@ final class Installer {
         self::deployClasses($packagePath, $packageInfo);
         self::deployScripts($packagePath, $packageInfo);
         self::runScript($packagePath, $packageInfo->getAfterInstall());
+        
+        if(class_exists("danilko09\\packages\\VersionControl") && $packageInfo->getVersion() != ""){            
+            danilko09\packages\VersionControl::setCurrentVersion($package, $packageInfo->getVersion());
+        }
     }
 
     private static function installDependencies(string $repoPath, Package $packageInfo, &$toInstall = []) {
