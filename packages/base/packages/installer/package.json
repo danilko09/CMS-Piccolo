@@ -1,0 +1,10 @@
+{
+    "title": "Установщик пакетов",
+    "category": "base",
+    "description": "Используется для установки или обновления пакетов",
+    
+    "classes": [
+        {"file_in":"Package.php", "file_out": "danilko09/packages/Package.php"},
+        {"file_in": "installer.php", "file_out": "danilko09/packages/Installer.php"}
+    ]
+}
