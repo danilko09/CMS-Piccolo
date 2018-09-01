@@ -16,7 +16,7 @@ class Package {
     private $scripts;
     private $afterInstall;
 
-    public static function __construct($info) {
+    public function __construct($info) {
         $this->info = $info;
 
         $this->requires = $info['requires'] ?? [];
