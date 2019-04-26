@@ -13,6 +13,9 @@ final class Installer {
      * @return Package Информация о пакете
      */
     public static function getPackageInfoFromJSONPath(string $path): Package {
+	if(!file_exists($path)){
+		throw new Exception("JSON not found (".$path.")");
+	}
         $json = file_get_contents($path);
         return new Package(json_decode($json, true));
     }
@@ -41,25 +44,29 @@ final class Installer {
      */
     public static function installPackage(string $repoPath, string $package, &$toInstall = []) {
         $packagePath = self::getPackagePath($repoPath, $package);
-        $packageInfo = self::getPackageInfoFromJSONPath($repoPath, $package);
+        $packageInfo = self::getPackageInfoFromRepo($repoPath, $package);
 
         self::installDependencies($repoPath, $packageInfo, $toInstall);
 
-        if(class_exists("danilko09\\packages\\VersionControl")){
-            if(!danilko09\packages\VersionControl::isCurrentLower($package, $packageInfo->getVersion()) &&
-                    !danilko09\packages\VersionControl::isVersionUndefined($package)){
+        if(class_exists("danilko09\\packages\\VersionControl") && !is_null($packageInfo->getVersion())){
+		if(!\danilko09\packages\VersionControl::isCurrentLower($package, $packageInfo->getVersion()) &&
+                    	!\danilko09\packages\VersionControl::isVersionUndefined($package)){
                 return;
             }
         }
         
-        self::runScript($packagePath, $packageInfo->getBeforeInstall());
+        if(!is_null($packageInfo->getBeforeInstall()))	
+        	self::runScript($packagePath, $packageInfo->getBeforeInstall());
+
         self::deployRootFiles($packagePath, $packageInfo);
         self::updateConfigs($packagePath, $packageInfo);
         self::installLocales($packagePath, $packageInfo);
         self::deployTemplates($packagePath, $packageInfo);
         self::deployClasses($packagePath, $packageInfo);
         self::deployScripts($packagePath, $packageInfo);
-        self::runScript($packagePath, $packageInfo->getAfterInstall());
+
+	if(!is_null($packageInfo->getAfterInstall()))
+	        self::runScript($packagePath, $packageInfo->getAfterInstall());
         
         if(class_exists("danilko09\\packages\\VersionControl") && $packageInfo->getVersion() != ""){            
             danilko09\packages\VersionControl::setCurrentVersion($package, $packageInfo->getVersion());
@@ -98,7 +105,7 @@ final class Installer {
 
             $mode = $fileInfo['mode'] ?? 'new';
             if ($mode == 'merge') {
-                $current = json_decode(file_get_contents($to), true);
+                $current = file_exists($to) ? json_decode(file_get_contents($to), true) : [];
                 $merged = self::merge_array(json_decode($fileData, true), $current);
                 self::deployFile('replace', $to, json_encode($merged));
             } else {
@@ -189,7 +196,7 @@ final class Installer {
             if (!isset($arr1[$key])) {
                 $arr1[$key] = $value;
             } elseif (is_array($arr1[$key]) && is_array($value)) {
-                $arr1[$key] = $this->merge_array($arr1[$key], $value);
+                $arr1[$key] = self::merge_array($arr1[$key], $value);
             } else {
                 $arr1[$key] = $value;
             }
