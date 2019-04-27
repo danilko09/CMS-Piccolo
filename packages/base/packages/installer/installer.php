@@ -68,8 +68,8 @@ final class Installer {
 	if(!is_null($packageInfo->getAfterInstall()))
 	        self::runScript($packagePath, $packageInfo->getAfterInstall());
         
-        if(class_exists("danilko09\\packages\\VersionControl") && $packageInfo->getVersion() != ""){            
-            danilko09\packages\VersionControl::setCurrentVersion($package, $packageInfo->getVersion());
+        if(class_exists("danilko09\\packages\\VersionControl") && !is_null($packageInfo->getVersion())){            
+            \danilko09\packages\VersionControl::setCurrentVersion($package, $packageInfo->getVersion());
         }
     }
 
