@@ -37,10 +37,10 @@ final class VersionControl {
         file_put_contents($dataPath, $version);
     }
 
-    private static function getPathForPackage($package) {
+    private static function getPathForPackage($package, $suffix = 'installed') {
         $packPath = str_replace("/", DIRECTORY_SEPARATOR, $package);
         return PICCOLO_DATA_DIR . DIRECTORY_SEPARATOR . 'VersionControl'
-                . DIRECTORY_SEPARATOR . $packPath;
+                . DIRECTORY_SEPARATOR . $packPath . '.' . $suffix;
     }
 
 }
