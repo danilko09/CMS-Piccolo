@@ -1,0 +1,10 @@
+{
+	"title":"index",
+	"description":"Подготоавливает среду для работы piccolo",
+	"version":"1.0",
+
+	"root": [
+		{"file_in":".htaccess","file_out":".htaccess"},
+		{"file_in":"index.php","file_out":"index.php"}
+	]
+}
