@@ -1,0 +1,9 @@
+{
+	"title": "Ядро",
+	"category": "base",
+	"version":"7_RC3.2",
+
+	"classes": [
+		{"file_in":"piccolo.php","file_out":"PICCOLO_ENGINE.php"}
+	]
+}
