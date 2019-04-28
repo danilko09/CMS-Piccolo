@@ -2,7 +2,9 @@
 	"title":"index",
 	"description":"Подготоавливает среду для работы piccolo",
 	"version":"1.0",
+	"requires":["base/core"],
 
+	"before_install": "genLocations.php",
 	"root": [
 		{"file_in":".htaccess","file_out":".htaccess"},
 		{"file_in":"index.php","file_out":"index.php"}
