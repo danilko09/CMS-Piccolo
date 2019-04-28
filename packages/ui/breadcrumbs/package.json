@@ -1,5 +1,7 @@
 {
     "title":"Хлебные крошки для сайта",
+    "requires": ["base/core"],
+
     "scripts":[
         {"file_in":"breadcrumbs.php","file_out":"piccolo_breadcrumbs.php","mode":"replace"}
     ],

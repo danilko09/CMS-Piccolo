@@ -12,8 +12,8 @@
 
         public static function autoload(){
             if(!isset(self::$config['autoreg']) || ((boolean) self::$config['autoreg'])){
-                WSE_ENGINE::RegisterTagHandler('comments', 'comments');
-                WSE_ENGINE::RegisterTagHandler('comments_count', 'comments');
+                PICCOLO_ENGINE::RegisterTagHandler('comments', 'comments');
+                PICCOLO_ENGINE::RegisterTagHandler('comments_count', 'comments');
             }
         }
 

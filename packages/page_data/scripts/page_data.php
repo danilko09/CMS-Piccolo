@@ -19,7 +19,7 @@
         public static function autoload(){
             //Регистрация обработчика тега
             if(!isset(self::$cfg['autoreg']) || ((boolean) self::$cfg['autoreg'])){
-                WSE_ENGINE::RegisterTagHandler('page', 'page_data');
+                PICCOLO_ENGINE::RegisterTagHandler('page', 'page_data');
             }
             
         }

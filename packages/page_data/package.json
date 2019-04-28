@@ -1,5 +1,7 @@
 {
     "title":"Скрипт распределения URI",
+    "requires": ["base/core"],
+
     "templates":[
         {"file_in":"templates/404.html","file_out":"404.html","mode":"new"}
     ],

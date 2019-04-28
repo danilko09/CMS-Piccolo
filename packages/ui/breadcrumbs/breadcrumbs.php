@@ -8,7 +8,7 @@
             if(self::$cfg == null){
                 self::$cfg = PICCOLO_ENGINE::loadConfig('piccolo_breadcrumbs');
             }
-            WSE_ENGINE::RegisterTagHandler('breadcrumbs', 'breadcrumbs');
+            PICCOLO_ENGINE::RegisterTagHandler('breadcrumbs', 'breadcrumbs');
         }
 
         public static function handleTag($tag){
