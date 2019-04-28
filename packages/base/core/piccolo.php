@@ -6,19 +6,11 @@ define('PICCOLO_START_MICROTIME', microtime(true));
 //Системная информация
 define('PICCOLO_CORE_BUILD', '7_RC3.2'); //Версия ядра
 define('PICCOLO_WORKS', true); //Пометка, что работает именно CMS Piccolo
-define('PICCOLO_SYSTEM_DEBUG', true); //Режим отладки (вкл/вкл)
-define('PICCOLO_SYSTEM_PRINT_TIMINGS',true);//Печатать системные тайминги или нет
-//Информация о папках
-define('PICCOLO_ROOT_DIR', __DIR__); //Корневая директория, где лежит этот файл
-define('PICCOLO_CMS_DIR', PICCOLO_ROOT_DIR . DIRECTORY_SEPARATOR . 'piccolo'); //Папка с файлами CMS
-define('PICCOLO_CMS_URL', '/piccolo'); //Внешний URI папки с файлами CMS
-define('PICCOLO_CONFIGS_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'config'); //Папка с конфигурационными файлами
-define('PICCOLO_DATA_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'data'); //Папка с пользовательскими данными
-define('PICCOLO_TEMPLATES_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'templates'); //Папка с файлами шаблонов оформления страниц
-define('PICCOLO_TEMPLATES_URL', PICCOLO_CMS_URL . '/templates'); //Внешний URI папки с шаблонами
-define('PICCOLO_SCRIPTS_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'scripts'); //Папка с расширениями (моудялми) системы
-define('PICCOLO_CLASSES_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'classpath'); //Папка с классами
-define('PICCOLO_TRANSLATIONS_DIR', PICCOLO_CMS_DIR . DIRECTORY_SEPARATOR . 'locales'); //Папка с локализациями системы
+if(!defined("PICCOLO_SYSTEM_DEBUG"))
+	define('PICCOLO_SYSTEM_DEBUG', true); //Режим отладки (вкл/вкл)
+if(!defined("PICCOLO_SYSTEM_PRINT_TIMINGS"))
+	define('PICCOLO_SYSTEM_PRINT_TIMINGS',true);//Печатать системные тайминги или нет
+
 //Включение вывода ошибок, если включена отладка
 if (PICCOLO_SYSTEM_DEBUG) {
     error_reporting(-1);
